@@ -1,7 +1,7 @@
 
 <img src="images/PCA_postexcavation_toolbar.png" />
 
-##PCA Post-excavation QGIS Plugin
+<h1>PCA Post-excavation QGIS Plugin</h1>
 
 PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase.
 	
