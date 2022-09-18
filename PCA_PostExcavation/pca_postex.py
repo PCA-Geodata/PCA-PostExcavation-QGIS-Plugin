@@ -784,129 +784,146 @@ class PCA_PostExc:
         result = self.dlgtool2.exec_()
         # See if OK was pressed
         if result:
-            progressMessageBar = iface.messageBar().createMessage("DRS is being updated...")
-            progress = QProgressBar()
-            progress.setMaximum(100)
-            progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
-            progressMessageBar.layout().addWidget(progress)
-            iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
             
-            
-            
-            progress.setValue(0)
             
             #add the action here
-            intervention_DRS_layer = QgsProject.instance().mapLayersByName("Interventions")[0]
             
-            ################################
-            ## Intervention layer update ###
-            ################################
+            if len(QgsProject.instance().mapLayersByName('Interventions')) == 0:
+                QMessageBox.about(
+                None,
+                'PCA PostExcavation Plugin',
+                '''This is not a valid PCA QGIS Site Plan Project''')
+                return self.dontdonothing()
+                
+            if len(QgsProject.instance().mapLayersByName('Interventions')) != 0:
             
-            #check if the group exists and, if not, create it
-            caps = intervention_DRS_layer.dataProvider().capabilities()    
-            resadd = intervention_DRS_layer.dataProvider()
+            
+                intervention_DRS_layer = QgsProject.instance().mapLayersByName("Interventions")[0]
+            
+                #Create progress bar
+                progressMessageBar = iface.messageBar().createMessage("DRS is being updated...")
+                progress = QProgressBar()
+                progress.setMaximum(100)
+                progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+                progressMessageBar.layout().addWidget(progress)
+                iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
+                
+                
+                
+                progress.setValue(0)
+                
+                
+                ################################
+                ## Intervention layer update ###
+                ################################
+                
+                #check if the group exists and, if not, create it
+                caps = intervention_DRS_layer.dataProvider().capabilities()    
+                resadd = intervention_DRS_layer.dataProvider()
+                            
+                group_field_name_list = ["Group","Entity", "Period", "Period Number", "Sub Period","Sub Period Number","Phase"]
+
+                for group_name in group_field_name_list:
+                    group_field_name = group_name
+                    field_index = intervention_DRS_layer.fields().indexFromName(group_name)
+                    if field_index == -1:
+                        resadd.addAttributes([QgsField(group_name, QVariant.String, '', 254)])
+                    
+
+                intervention_DRS_layer.updateFields()  
+                progress.setValue(15)
+
+                #############################
+                print('step 2')
+                #add the attributes to Intervention from Features_for_PostEx
+                
+                
+                intervention_DRS_layer.startEditing()
+
+                for group_name in group_field_name_list:
+
+                    if group_name == "Period Number":
+                        group_name_contract = "Period Num"
+                    elif group_name == 'Sub Period':
+                        group_name_contract = 'SubPeriod'
+                    elif group_name == 'Sub Period Number':
+                        group_name_contract = 'SubPer_no'
+                    else:
+                        group_name_contract = group_name
+
+                    e = QgsExpression( '''\
+                    array_to_string(\
+                    array_majority( \
+                    aggregate(\
+                    layer:='Features_for_PostEx',\
+                    aggregate:='array_agg',\
+                    expression:='''+group_name_contract+''',\
+                    filter:=intersects($geometry,buffer(geometry(@parent),-0.01))\
+                    )))\
+                    ''' )
+
+                    context = QgsExpressionContext()
+                    context.appendScopes(QgsExpressionContextUtils.globalProjectLayerScopes(intervention_DRS_layer))
+
+                    for f in intervention_DRS_layer.getFeatures():
+                        context.setFeature(f)
+                        f[group_name] = e.evaluate( context )
+                        intervention_DRS_layer.updateFeature( f )
+
+
+                intervention_DRS_layer.commitChanges()
+                progress.setValue(25)
+                #######################
+                ## DRS Table update ###
+                #######################
+                print('step 3')
+                intervention = QgsProject.instance().mapLayersByName('Interventions')[0]
+                DRS_to_update = QgsProject.instance().mapLayersByName('DRS_Table')[0]
+
+
+                caps = DRS_to_update.dataProvider().capabilities()    
+                resadd = DRS_to_update.dataProvider()
+
+                # group_field_name_list = ["Group","Entity", "Period", "Period Number", "Sub Period","Sub Period Number","Phase"]
+
+                for group_name in group_field_name_list:
+                    group_field_name = group_name
+                    field_index = DRS_to_update.fields().indexFromName(group_name)
+                    if field_index == -1:
+                        resadd.addAttributes([QgsField(group_name, QVariant.String, '', 254)])
+
+                DRS_to_update.updateFields()  
+                
+                progress.setValue(30)
+                time_value = 30
+                for group_name in group_field_name_list:
+                    
+                    for f in DRS_to_update.getFeatures():
+                        cut = f["Cut"]
+                        id = f.id()
                         
-            group_field_name_list = ["Group","Entity", "Period", "Period Number", "Sub Period","Sub Period Number","Phase"]
+                        any_group_field_idx = DRS_to_update.fields().indexOf(group_name)
+                        
+                        exp = QgsExpression('context_no = '+cut)
+                        request = QgsFeatureRequest(exp)
+                        
+                        for fea in intervention.getFeatures(request):
+                            group = fea[group_name]
 
-            for group_name in group_field_name_list:
-                group_field_name = group_name
-                field_index = intervention_DRS_layer.fields().indexFromName(group_name)
-                if field_index == -1:
-                    resadd.addAttributes([QgsField(group_name, QVariant.String, '', 254)])
-                
-
-            intervention_DRS_layer.updateFields()  
-            progress.setValue(15)
-
-            #############################
-            print('step 2')
-            #add the attributes to Intervention from Features_for_PostEx
-            
-            
-            intervention_DRS_layer.startEditing()
-
-            for group_name in group_field_name_list:
-
-                if group_name == "Period Number":
-                    group_name_contract = "Period Num"
-                elif group_name == 'Sub Period':
-                    group_name_contract = 'SubPeriod'
-                elif group_name == 'Sub Period Number':
-                    group_name_contract = 'SubPer_no'
-                else:
-                    group_name_contract = group_name
-
-                e = QgsExpression( '''\
-                array_to_string(\
-                array_majority( \
-                aggregate(\
-                layer:='Features_for_PostEx',\
-                aggregate:='array_agg',\
-                expression:='''+group_name_contract+''',\
-                filter:=intersects($geometry,buffer(geometry(@parent),-0.01))\
-                )))\
-                ''' )
-
-                context = QgsExpressionContext()
-                context.appendScopes(QgsExpressionContextUtils.globalProjectLayerScopes(intervention_DRS_layer))
-
-                for f in intervention_DRS_layer.getFeatures():
-                    context.setFeature(f)
-                    f[group_name] = e.evaluate( context )
-                    intervention_DRS_layer.updateFeature( f )
-
-
-            intervention_DRS_layer.commitChanges()
-            progress.setValue(25)
-            #######################
-            ## DRS Table update ###
-            #######################
-            print('step 3')
-            intervention = QgsProject.instance().mapLayersByName('Interventions')[0]
-            DRS_to_update = QgsProject.instance().mapLayersByName('DRS_Table')[0]
-
-
-            caps = DRS_to_update.dataProvider().capabilities()    
-            resadd = DRS_to_update.dataProvider()
-
-            # group_field_name_list = ["Group","Entity", "Period", "Period Number", "Sub Period","Sub Period Number","Phase"]
-
-            for group_name in group_field_name_list:
-                group_field_name = group_name
-                field_index = DRS_to_update.fields().indexFromName(group_name)
-                if field_index == -1:
-                    resadd.addAttributes([QgsField(group_name, QVariant.String, '', 254)])
-
-            DRS_to_update.updateFields()  
-            
-            progress.setValue(30)
-            time_value = 30
-            for group_name in group_field_name_list:
-                
-                for f in DRS_to_update.getFeatures():
-                    cut = f["Cut"]
-                    id = f.id()
+                        DRS_to_update.startEditing()
+                        DRS_to_update.selectByExpression("$id ="+ str(id))
+                        for feat_id in DRS_to_update.selectedFeatureIds():
+                            DRS_to_update.changeAttributeValue(feat_id, any_group_field_idx, group)
+                    DRS_to_update.commitChanges()
+                    time_value += 10
                     
-                    any_group_field_idx = DRS_to_update.fields().indexOf(group_name)
-                    
-                    exp = QgsExpression('context_no = '+cut)
-                    request = QgsFeatureRequest(exp)
-                    
-                    for fea in intervention.getFeatures(request):
-                        group = fea[group_name]
-
-                    DRS_to_update.startEditing()
-                    DRS_to_update.selectByExpression("$id ="+ str(id))
-                    for feat_id in DRS_to_update.selectedFeatureIds():
-                        DRS_to_update.changeAttributeValue(feat_id, any_group_field_idx, group)
-                DRS_to_update.commitChanges()
-                time_value += 10
+                    print (group_name)
+                    progress.setValue(time_value)
                 
-                print (group_name)
-                progress.setValue(time_value)
-            
-            progress.setValue(100)
-            iface.messageBar().clearWidgets()
-            QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS has been successfully updated.')  
+                progress.setValue(100)
+                iface.messageBar().clearWidgets()
+                QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS has been successfully updated.')  
+                
+                
     def dontdonothing(self):
             pass
