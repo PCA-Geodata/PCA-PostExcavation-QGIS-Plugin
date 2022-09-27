@@ -6,7 +6,7 @@
 name=PCA Post-excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=1.02
+version=1.02.1
 author=Valerio Pinna
 email=vpinna@pre-construct.com
 

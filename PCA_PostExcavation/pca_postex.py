@@ -84,9 +84,7 @@ class PCA_PostExc:
         self.menu = self.tr(u'&PCA PostExcavation')
         
         # Test ## Add dialogues istances
-        self.dlg = PCA_PostExcDialog()
-        #self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        
+        self.dlg = PCA_PostExcDialog()        
         self.dlgtool2 = PCA_PostExc_updateDRS_Dialog()
         self.dlgtool3 = PCA_PostExc_GenerateLayer_Dialog()
         self.dlgtool4 = PCA_PostExc_ProgressBar_Dialog()
@@ -116,7 +114,6 @@ class PCA_PostExc:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('PCA_PostExc', message)
-
 
     def add_action(
         self,
@@ -246,7 +243,6 @@ class PCA_PostExc:
         # will be set False in run()
         self.first_start = True
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -261,13 +257,11 @@ class PCA_PostExc:
         self.dlg.group_name_comboBox.clear()
         self.dlg.group_name_comboBox.addItems(group_names_list)
         
-        
     def entity_names_list(self):
         entity_names_list = ['','Cemetery','Field System','Enclosure', 'Linear Boundary','Road/Trackway','Monument', 'Palaeochannel' ]
         
         self.dlg.entity_name_comboBox.clear()
         self.dlg.entity_name_comboBox.addItems(entity_names_list)
-        
         
     def period_list(self):
         period_list = ['','Neolithic', 'Bronze Age', 'Iron Age', 'Roman', 'Saxon', 'Medieval', 'Post Medieval', 'Modern']
@@ -434,8 +428,7 @@ class PCA_PostExc:
             self.dlg.entity_number_comboBox.addItems(proposed_entity_number_list)  
             used_entity_list.clear()
             entity_filtered_list.clear()
-        
-                            
+                                  
     def change_attributes(self):
         """Run method that performs all the real work"""
         
@@ -517,7 +510,7 @@ class PCA_PostExc:
                     sub_period_field_idx = layer.fields().indexOf('SubPeriod')
                     sub_period_new_value = subperiod
                     
-                    period_number_field_idx = layer.fields().indexOf('Period Num')
+                    period_number_field_idx = layer.fields().indexOf('Period_no')
                     period_number_new_value = period_number
                     
                     sub_period_number_field_idx = layer.fields().indexOf('SubPer_no')
@@ -716,7 +709,7 @@ class PCA_PostExc:
             resadd.addAttributes([QgsField('Group', QVariant.String, '', 254),
                                   QgsField('Entity', QVariant.String, '', 254),
                                   QgsField('Period', QVariant.String, '', 254),
-                                  QgsField('Period Num', QVariant.String, '', 254),
+                                  QgsField('Period_no', QVariant.String, '', 254),
                                   QgsField('SubPeriod', QVariant.String, '', 254),
                                   QgsField('SubPer_no', QVariant.String, '', 254),
                                   QgsField('Phase', QVariant.String, '', 254),
@@ -767,9 +760,6 @@ class PCA_PostExc:
             restyle_layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
             restyle_layer.loadNamedStyle(os.path.join(os.path.join(cmd_folder, 'qml/PCA_PostExcavation_Features_Style.qml')))    
             iface.mapCanvas().refresh()
-
-
-
 
     def update_DRS_table(self):
 
@@ -834,7 +824,7 @@ class PCA_PostExc:
                 progress.setValue(15)
 
                 #############################
-                print('step 2')
+
                 #add the attributes to Intervention from Features_for_PostEx
                 
                 
@@ -843,7 +833,7 @@ class PCA_PostExc:
                 for group_name in group_field_name_list:
 
                     if group_name == "Period Number":
-                        group_name_contract = "Period Num"
+                        group_name_contract = "Period_no"
                     elif group_name == 'Sub Period':
                         group_name_contract = 'SubPeriod'
                     elif group_name == 'Sub Period Number':
@@ -868,7 +858,7 @@ class PCA_PostExc:
                     for f in intervention_DRS_layer.getFeatures():
                         context.setFeature(f)
                         f[group_name] = e.evaluate( context )
-                        intervention_DRS_layer.updateFeature( f )
+                        intervention_DRS_layer.updateFeature(f)
 
 
                 intervention_DRS_layer.commitChanges()
@@ -876,7 +866,7 @@ class PCA_PostExc:
                 #######################
                 ## DRS Table update ###
                 #######################
-                print('step 3')
+            
                 intervention = QgsProject.instance().mapLayersByName('Interventions')[0]
                 DRS_to_update = QgsProject.instance().mapLayersByName('DRS_Table')[0]
 
@@ -917,7 +907,6 @@ class PCA_PostExc:
                     DRS_to_update.commitChanges()
                     time_value += 10
                     
-                    print (group_name)
                     progress.setValue(time_value)
                 
                 progress.setValue(100)
