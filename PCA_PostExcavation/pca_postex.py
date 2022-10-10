@@ -378,16 +378,12 @@ class PCA_PostExc:
                 name = f["Group"]
                 if name != NULL:
                     used_group_list.add(name)
-                    
-                    
-            print (used_group_list)
+
             filtered_list = []
             for a in used_group_list:
                 if a.find(ch_group_name) == 0:
                     filtered_list.append(a)
-            
-            print (filtered_list)
-            print (len(filtered_list)+1)
+         
             new_group_number = str((len(filtered_list)+1))
             proposed_group_number_list = []
             proposed_group_number_list.append(new_group_number)
@@ -411,15 +407,11 @@ class PCA_PostExc:
                 if name != NULL:
                     used_entity_list.add(name)
                     
-                    
-            print (used_entity_list)
             entity_filtered_list = []
             for a in used_entity_list:
                 if a.find(ch_entity_name) == 0:
                     entity_filtered_list.append(a)
             
-            print (entity_filtered_list)
-            print (len(entity_filtered_list)+1)
             new_entity_number = str((len(entity_filtered_list)+1))
             proposed_entity_number_list = []
             proposed_entity_number_list.append(new_entity_number)
@@ -432,31 +424,27 @@ class PCA_PostExc:
     def change_attributes(self):
         """Run method that performs all the real work"""
         
-        
-        
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-        if self.first_start == True:
-            self.first_start = False
+        # if self.first_start == True:
+            # self.first_start = False
             
             
             # self.dlg = PCA_PostExcDialog()
-            self.period_list()
-            self.group_names_list()
-            self.entity_names_list()
-            
-            
-            
-            self.dlg.period_comboBox.currentTextChanged.connect(self.subperiod_list_changed)
-            self.dlg.period_comboBox.currentTextChanged.connect(self.change_period_number)
-            
-            self.dlg.sub_period_comboBox.currentTextChanged.connect(self.change_subperiod_number)
-            
-            self.dlg.group_name_comboBox.currentTextChanged.connect(self.change_group_number)
-            self.dlg.entity_name_comboBox.currentTextChanged.connect(self.change_entity_number)
-            
-            
+        self.period_list()
+        self.group_names_list()
+        self.entity_names_list()
         
+
+        self.dlg.period_comboBox.currentTextChanged.connect(self.subperiod_list_changed)
+        self.dlg.period_comboBox.currentTextChanged.connect(self.change_period_number)
+        
+        self.dlg.sub_period_comboBox.currentTextChanged.connect(self.change_subperiod_number)
+        
+        self.dlg.group_name_comboBox.currentTextChanged.connect(self.change_group_number)
+        self.dlg.entity_name_comboBox.currentTextChanged.connect(self.change_entity_number)
+            
+
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
             QMessageBox.warning(
             None,
@@ -521,12 +509,7 @@ class PCA_PostExc:
                     
                     entity_field_idx = layer.fields().indexOf('Entity')
                     
-                    
                     phase_field_idx = layer.fields().indexOf('Phase')
-                    
-                 
-                    
-                    
                     
                     layer.startEditing()
                     for feat_id in layer.selectedFeatureIds():
@@ -536,23 +519,17 @@ class PCA_PostExc:
                         layer.changeAttributeValue(feat_id, period_number_field_idx, period_number_new_value)
                         layer.changeAttributeValue(feat_id, sub_period_number_field_idx, sub_period_number_new_value)
                        
-                    
-                    
                         # if len(group_value) < 2:
                             # return self.dontdonothing()
                         if len(group_value) > 3:
                             #for feat_id in layer.selectedFeatureIds():
                             layer.changeAttributeValue(feat_id, group_field_idx, group_new_value)
-                          
-                    
-                    
+
                         # if len(entity_value) < 2:
                             # return self.dontdonothing()
                         if len(entity_value) > 3:
                             #for feat_id in layer.selectedFeatureIds():
                             layer.changeAttributeValue(feat_id, entity_field_idx, entity_value)
-                        
-                        
                         
                         # if len(phase) == 0:
                             # return self.dontdonothing()
@@ -560,9 +537,7 @@ class PCA_PostExc:
                             #for feat_id in layer.selectedFeatureIds():
                             layer.changeAttributeValue(feat_id, phase_field_idx, phase)
                             
-                            
-                   
-                    
+
                     layer.commitChanges()
                     self.dlg.group_number_comboBox.clear()
                     self.dlg.group_name_comboBox.clear()   
@@ -573,8 +548,7 @@ class PCA_PostExc:
         if self.first_start == True:
             self.first_start = False
             
-            
-            
+  
         # show the dialog
         self.dlgtool3.show()
         # Run the dialog event loop
@@ -583,8 +557,6 @@ class PCA_PostExc:
         if result:
             #add the action here
             
-        
-        
             root = QgsProject.instance().layerTreeRoot()
             if root.findGroup("Site Plan") is None:
                 QMessageBox.about(
@@ -648,32 +620,13 @@ class PCA_PostExc:
             shapefile_list = []
 
           
-
-            origlayer_feature = QgsProject.instance().mapLayersByName('Archaeological_Features')[0]
-            origlayer_feature_path = origlayer_feature.source()
-            shapefile_list.append(origlayer_feature_path)
+            list_of_layers = ['Archaeological_Features', 'Burials', 'Layers', 'Masonry', 'Modern', 'Furrows_and_Ridges' ]
+            for e in list_of_layers:
+                if QgsProject.instance().mapLayersByName(e):
+                    origlayer= QgsProject.instance().mapLayersByName(e)[0]
+                    origlayer_path = origlayer.source()
+                    shapefile_list.append(origlayer_path)
             
-            origlayer_burial = QgsProject.instance().mapLayersByName('Burials')[0]
-            origlayer_burial_path = origlayer_burial.source()
-            shapefile_list.append(origlayer_burial_path)
-            
-            origlayer_layers = QgsProject.instance().mapLayersByName('Layers')[0]
-            origlayer_layers_path = origlayer_layers.source()
-            shapefile_list.append(origlayer_layers_path)
-            
-            origlayer_masonry = QgsProject.instance().mapLayersByName('Masonry')[0]
-            origlayer_masonry_path = origlayer_masonry.source()
-            shapefile_list.append(origlayer_masonry_path)
-            
-            origlayer_modern = QgsProject.instance().mapLayersByName('Modern')[0]
-            origlayer_modern_path = origlayer_modern.source()
-            shapefile_list.append(origlayer_modern_path)
-            
-            origlayer_furrows = QgsProject.instance().mapLayersByName('Furrows_and_Ridges')[0]
-            origlayer_furrows_path = origlayer_furrows.source()
-            shapefile_list.append(origlayer_furrows_path)
-            
-
             parameters = {'LAYERS': shapefile_list, 
                           'CRS': 'EPSG:27700', 
                           'OUTPUT': str(path+'/Features_for_PostEx.shp')}
@@ -702,8 +655,24 @@ class PCA_PostExc:
             #remove fields
             final_layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
             caps = final_layer.dataProvider().capabilities()
-            res = final_layer.dataProvider().deleteAttributes([0,1,2,3,4,5,6,7,8,10])
-            ##add new fields
+            
+            id_list = []
+            fields_list = []
+            for field in final_layer.fields():
+                fields_list.append(field.name())
+            if 'layer' in fields_list:
+                fields_list.remove('layer')
+  
+
+            for e in fields_list:
+                id_list.append(final_layer.fields().indexFromName(e))
+
+
+            
+            res = final_layer.dataProvider().deleteAttributes(id_list)
+            
+            
+            #add new fields
             
             resadd = final_layer.dataProvider()
             resadd.addAttributes([QgsField('Group', QVariant.String, '', 254),
@@ -731,12 +700,11 @@ class PCA_PostExc:
             myLayerNode = root.findLayer(final_layer.id())
             myLayerNode.setExpanded(True)
 
-            root.findLayer(origlayer_feature.id()).setItemVisibilityCheckedParentRecursive(False)
-            root.findLayer(origlayer_burial.id()).setItemVisibilityCheckedParentRecursive(False)
-            root.findLayer(origlayer_layers.id()).setItemVisibilityCheckedParentRecursive(False)
-            root.findLayer(origlayer_masonry.id()).setItemVisibilityCheckedParentRecursive(False)
-            root.findLayer(origlayer_modern.id()).setItemVisibilityCheckedParentRecursive(False)
-            root.findLayer(origlayer_furrows.id()).setItemVisibilityCheckedParentRecursive(False)
+            for e in list_of_layers:
+                if QgsProject.instance().mapLayersByName(e):
+                    origlayer= QgsProject.instance().mapLayersByName(e)[0]
+                    root.findLayer(origlayer.id()).setItemVisibilityCheckedParentRecursive(False)
+            
             
             QgsProject.instance().layerTreeRoot().findGroup(sitenamegroup).setItemVisibilityChecked(True)
             QgsProject.instance().layerTreeRoot().findGroup('Site Plan').setItemVisibilityChecked(True)
@@ -763,8 +731,8 @@ class PCA_PostExc:
 
     def update_DRS_table(self):
 
-        if self.first_start == True:
-            self.first_start = False
+        # if self.first_start == True:
+            # self.first_start = False
             
             
             
