@@ -5,6 +5,8 @@
 		<file>icons/pca_logo_icon.png</file>
 		<file>icons/PCA_postex_reapply_style_icon.png</file>
 		<file>icons/PCA_postex_change_attribute_icon.png</file>
-		<file>icons/PCA_postex_update_DRS_icon.png</file>		
+		<file>icons/PCA_postex_update_DRS_icon.png</file>
+		<file>icons/PCA_postex_clean_rules_icon.png</file>
+		<file>icons/PCA_postex_export_to_access_icon.png</file>
 		</qresource>
 </RCC>

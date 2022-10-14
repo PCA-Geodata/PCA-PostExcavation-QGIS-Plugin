@@ -23,8 +23,10 @@
 """
 import os
 import time
+import os.path
 import inspect
 import processing
+from datetime import date, datetime
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, QVariant
 from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QMessageBox, QToolBar, QShortcut, QProgressBar
@@ -45,9 +47,9 @@ from .resources import *
 from .pca_postex_dialog import PCA_PostExcDialog
 from .pca_postex_update_DRS_dialog import PCA_PostExc_updateDRS_Dialog
 from .pca_postex_generate_layer_dialog import PCA_PostExc_GenerateLayer_Dialog
-from .pca_postex_progress_bar_dialog import PCA_PostExc_ProgressBar_Dialog
+from .pca_postex_export_to_access_dialog import PCA_PostExc_ExportToAccess_Dialog
 
-import os.path
+
 
 
 cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
@@ -87,7 +89,7 @@ class PCA_PostExc:
         self.dlg = PCA_PostExcDialog()        
         self.dlgtool2 = PCA_PostExc_updateDRS_Dialog()
         self.dlgtool3 = PCA_PostExc_GenerateLayer_Dialog()
-        self.dlgtool4 = PCA_PostExc_ProgressBar_Dialog()
+        self.dlgtool4 = PCA_PostExc_ExportToAccess_Dialog()
         
         self.toolbar = iface.mainWindow().findChild( QToolBar, u'PCA PostExcavation Toolbar' )
         if not self.toolbar:
@@ -95,7 +97,10 @@ class PCA_PostExc:
             self.toolbar.setObjectName( u'PCA PostExcavation Toolbar' )
             self.toolbar.setToolTip("")
         
-
+        
+        self.dlgtool4.Tables_on_GIS_comboBox.setFilters(QgsMapLayerProxyModel.NoGeometry ) 
+        
+        
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
@@ -193,7 +198,7 @@ class PCA_PostExc:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""       
             
-        self.changeattributes= self.add_action( 
+        self.PCAlogo= self.add_action( 
             icon_path = ':/plugins/pca_postex/icons/pca_logo_icon.png',
             text=self.tr(u''),
             callback=self.dontdonothing,
@@ -217,7 +222,7 @@ class PCA_PostExc:
         # will be set False in change_attributes()
         self.first_start = True
         
-        self.changeattributes= self.add_action( 
+        self.reapply_style= self.add_action( 
             icon_path = ':/plugins/pca_postex/icons/PCA_postex_reapply_style_icon.png',
             text=self.tr(u'Re-apply the Period Colours Style'),
             callback=self.reapply_period_style,
@@ -225,8 +230,15 @@ class PCA_PostExc:
         # will be set False in change_attributes()
         self.first_start = True
         
+        self.cleanrules= self.add_action( 
+            icon_path = ':/plugins/pca_postex/icons/PCA_postex_clean_rules_icon.png',
+            text=self.tr(u'Remove empty periods from the symbology'),
+            callback=self.clean_empty_rules,
+            parent=self.iface.mainWindow())     
+        # will be set False in change_attributes()
+        self.first_start = True
         
-        self.changeattributes= self.add_action( 
+        self.updateDRS= self.add_action( 
             icon_path = ':/plugins/pca_postex/icons/PCA_postex_update_DRS_icon.png',
             text=self.tr(u'Update the DRS spreadsheet with the post-excavation information'),
             callback=self.update_DRS_table,
@@ -235,11 +247,14 @@ class PCA_PostExc:
         self.first_start = True
         
         
+        self.exportforAccess= self.add_action( 
+            icon_path = ':/plugins/pca_postex/icons/PCA_postex_export_to_access_icon.png',
+            text=self.tr(u'Export a formatted version of the DRS spreadsheet that can be imported on Access'),
+            callback=self.export_table_for_access,
+            parent=self.iface.mainWindow())     
+        # will be set False in change_attributes()
+        self.first_start = True
         
-        
-        
-
-
         # will be set False in run()
         self.first_start = True
 
@@ -431,18 +446,7 @@ class PCA_PostExc:
             
             
             # self.dlg = PCA_PostExcDialog()
-        self.period_list()
-        self.group_names_list()
-        self.entity_names_list()
         
-
-        self.dlg.period_comboBox.currentTextChanged.connect(self.subperiod_list_changed)
-        self.dlg.period_comboBox.currentTextChanged.connect(self.change_period_number)
-        
-        self.dlg.sub_period_comboBox.currentTextChanged.connect(self.change_subperiod_number)
-        
-        self.dlg.group_name_comboBox.currentTextChanged.connect(self.change_group_number)
-        self.dlg.entity_name_comboBox.currentTextChanged.connect(self.change_entity_number)
             
 
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
@@ -453,7 +457,21 @@ class PCA_PostExc:
         ####ADD CHECK FOR LAYER AND MESSAGE HOW TO CREATE IT#########
         else: 
             layer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
-             
+            self.period_list()
+            self.group_names_list()
+            self.entity_names_list()
+            
+
+            self.dlg.period_comboBox.currentTextChanged.connect(self.subperiod_list_changed)
+            self.dlg.period_comboBox.currentTextChanged.connect(self.change_period_number)
+            
+            self.dlg.sub_period_comboBox.currentTextChanged.connect(self.change_subperiod_number)
+            
+            self.dlg.group_name_comboBox.currentTextChanged.connect(self.change_group_number)
+            self.dlg.entity_name_comboBox.currentTextChanged.connect(self.change_entity_number)
+            
+            
+            
             # Check, with messages, that at least one feature is selected
             if layer.selectedFeatureCount() == 0:
                 QMessageBox.warning(
@@ -539,6 +557,7 @@ class PCA_PostExc:
                             
 
                     layer.commitChanges()
+                    layer.removeSelection()
                     self.dlg.group_number_comboBox.clear()
                     self.dlg.group_name_comboBox.clear()   
                     self.dlg.entity_number_comboBox.clear()
@@ -728,6 +747,27 @@ class PCA_PostExc:
             restyle_layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
             restyle_layer.loadNamedStyle(os.path.join(os.path.join(cmd_folder, 'qml/PCA_PostExcavation_Features_Style.qml')))    
             iface.mapCanvas().refresh()
+            
+    def clean_empty_rules(self):
+        if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
+            return self.dontdonothing
+        else: 
+            restyle_layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
+            
+            r = restyle_layer.renderer()
+            if r.type() == 'RuleRenderer':
+                for rule in r.rootRule().children(): # Iterate rules
+                    if rule.filter(): # Filter out empty rules
+                        request = QgsFeatureRequest( rule.filter() )
+                        count = len( [f for f in restyle_layer.getFeatures( request )] )
+                        print (rule.label() + ' : ' + str(count))
+                        if count == 0:
+             
+                            r.rootRule().removeChild(rule)
+
+            restyle_layer.triggerRepaint() 
+            iface.layerTreeView().refreshLayerSymbology( restyle_layer.id() )
+            restyle_layer.emitStyleChanged()
 
     def update_DRS_table(self):
 
@@ -809,16 +849,28 @@ class PCA_PostExc:
                     else:
                         group_name_contract = group_name
 
-                    e = QgsExpression( '''\
-                    array_to_string(\
-                    array_majority( \
-                    aggregate(\
-                    layer:='Features_for_PostEx',\
-                    aggregate:='array_agg',\
+                    ###old expression. Creates duplicated value if a slot is below two features (es. ditch and layer) and a false result if a slot has two interventions (es, old cut below all)
+                    # e = QgsExpression( '''\
+                    # array_to_string(\
+                    # array_majority( \
+                    # aggregate(\
+                    # layer:='Features_for_PostEx',\
+                    # aggregate:='array_agg',\
+                    # expression:='''+group_name_contract+''',\
+                    # filter:=intersects($geometry,buffer(geometry(@parent),-0.01))\
+                    # )))\
+                    # ''' )
+                    
+                    e = QgsExpression( '''
+                    array_to_string(
+                    array_majority( 
+                    aggregate(
+                    layer:='Features_for_PostEx',
+                    aggregate:='array_agg',
                     expression:='''+group_name_contract+''',\
-                    filter:=intersects($geometry,buffer(geometry(@parent),-0.01))\
-                    )))\
-                    ''' )
+                    filter:=intersects(boundary(buffer($geometry, -0.01)), geometry(@parent))
+                    )))
+                    ''')
 
                     context = QgsExpressionContext()
                     context.appendScopes(QgsExpressionContextUtils.globalProjectLayerScopes(intervention_DRS_layer))
@@ -880,7 +932,253 @@ class PCA_PostExc:
                 progress.setValue(100)
                 iface.messageBar().clearWidgets()
                 QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS has been successfully updated.')  
+                     
+    def export_table_for_access(self):
+            # show the dialog
+        self.dlgtool4.show()
+        # Run the dialog event loop
+        result = self.dlgtool4.exec_()
+        # See if OK was pressed
+        if result:
+            
+            table_to_export = self.dlgtool4.Tables_on_GIS_comboBox.currentLayer() 
+            sitecode =  self.dlgtool4.sitecode_textbox.text()
+            filename =  table_to_export.name()
+            now = datetime.now().strftime("%Y%m%d_%H%M%S")
+            if len(table_to_export) == 0:
+                QMessageBox.about(None,'PCA PostExcavation Plugin', 'No valid DRS table was selected. Please select a layer.')
+                return self.dontdonothing()
+             
+            else:
+                
+                    
+                # Directory
+                CSV_export_directory = "Exported_CSV"
+
+                #Project Folder
+                project_dir = QgsProject.instance().homePath() + '/Databases/'
+
+                path = os.path.join(project_dir,CSV_export_directory)
+
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                else:
+                    pass
+              
+                combined_description_express ='''
+                if("Type"='Cut', 
+                concat("Shape",', ',replace(lower(regexp_replace("Sides",' ([(].*?[)])','')),',',' and'),' sides',', ',lower("Base"),' base'||' and ', "Orientation" , ' aligned')
+                ,
+				concat("Compaction",' compaction, ',lower("Tone"),' '||lower("Hue"),' '||lower("Colour"),' ',lower("Composition"),
+                if("Significant_ Inclusions" is not null, ' with ', ''),lower("Significant_ Inclusions")))
+                '''
+                
+                if table_to_export.name() == 'DRS_Table':
+                    DRS_Field_scheme = [
+                    ##add sitecode as first field
+                    {'expression': "'"+sitecode+"'",'length': 100,'name': 'Site Code','precision': 0,'type': 10},
+                    {'expression': '"Context"','length': 0,'name': 'Context No','precision': 0,'type': 2},
+                    {'expression': '"Cut"','length': 0,'name': 'Cut','precision': 0,'type': 2},
+                    {'expression': '"Trench"','length': 0,'name': 'Trench','precision': 0,'type': 2},
+                    {'expression': '"Type"','length': 0,'name': 'Type','precision': 0,'type': 10},
+                    {'expression': '"Category"','length': 0,'name': 'Category','precision': 0,'type': 10},
+                    {'expression': '"Length"','length': 0,'name': 'Length (m)','precision': 3,'type': 6},
+                    {'expression': '"Width"','length': 0,'name': 'Width (m)','precision': 3,'type': 6},
+                    {'expression': '"Depth"','length': 0,'name': 'Depth (m)','precision': 3,'type': 6},
+                    {'expression': '"Plan"','length': 0,'name': 'Plan','precision': 0,'type': 10},
+                    {'expression': '"Section_Sheet"','length': 0,'name': 'Section Sheet','precision': 0,'type': 10},
+                    {'expression': '"Section"','length': 0,'name': 'Section','precision': 0,'type': 10},
+                    {'expression': '"Additional_Sections"','length': 0,'name': 'Additional Sections','precision': 0,'type': 10},
+                    #create a Description Field that sum all description fields (long field)
+                    {'expression': combined_description_express,'length': 255,'name': 'Description','precision': 0,'type': 10},
+                    #
+                    {'expression': '"Stratigraphically_above"','length': 0,'name': 'Stratigraphically_above','precision': 0,'type': 10},
+                    {'expression': '"Stratigraphically_below"','length': 0,'name': 'Stratigraphically_below','precision': 0,'type': 10},
+                    #photos
+                    {'expression': '"Camera_set_number"','length': 0,'name': 'Camera Set Number','precision': 0,'type': 10},
+                    {'expression': '"Photo_numbers"','length': 0,'name': 'Photo Numbers','precision': 0,'type': 10},
+                    #used for cut description. Keep them? Add a selectable option
+                    # {'expression': '"Shape"','length': 0,'name': 'Shape','precision': 0,'type': 10},
+                    # {'expression': '"Sides"','length': 0,'name': 'Sides','precision': 0,'type': 10},
+                    # {'expression': '"Base"','length': 0,'name': 'Base','precision': 0,'type': 10},
+                    # {'expression': '"Orientation"','length': 0,'name': 'Orientation','precision': 0,'type': 10},
+                    #
+                    {'expression': '"Cuts"','length': 0,'name': 'Cuts','precision': 0,'type': 10},
+                    {'expression': '"Cut_by"','length': 0,'name': 'Cut by','precision': 0,'type': 10},
+                    {'expression': '"Number_of_fills"','length': 0,'name': 'Number of fills','precision': 0,'type': 10},
+                    {'expression': '"Interpretation"','length': 0,'name': 'Interpretation','precision': 0,'type': 10},
+                    #postex data
+                    {'expression': '"Group"','length': 254,'name': 'Group','precision': 0,'type': 10},
+                    {'expression': '"Entity"','length': 254,'name': 'Entity','precision': 0,'type': 10},
+                    {'expression': '"Period"','length': 254,'name': 'Period','precision': 0,'type': 10},
+                    {'expression': '"Period Number"','length': 254,'name': 'Period Number','precision': 0,'type': 10},
+                    {'expression': '"Sub Period"','length': 254,'name': 'Sub-Period','precision': 0,'type': 10},
+                    {'expression': '"Sub Period Number"','length': 254,'name': 'Sub-Period Number','precision': 0,'type': 10},
+                    {'expression': '"Phase"','length': 254,'name': 'Phase','precision': 0,'type': 10},
+                    # used for fill description. Keep them? Add a selectable option
+                    # {'expression': '"Compaction"','length': 0,'name': 'Compaction','precision': 0,'type': 10},
+                    # {'expression': '"Tone"','length': 0,'name': 'Tone','precision': 0,'type': 10},
+                    # {'expression': '"Hue"','length': 0,'name': 'Hue','precision': 0,'type': 10},
+                    # {'expression': '"Colour"','length': 0,'name': 'Colour','precision': 0,'type': 10},
+                    # {'expression': '"Composition"','length': 0,'name': 'Composition','precision': 0,'type': 10},
+                    # {'expression': '"Significant_ Inclusions"','length': 0,'name': 'Significant_ Inclusions','precision': 0,'type': 10},
+                    #
+                    {'expression': '"Fill_Sequence"','length': 0,'name': 'Fill Sequence','precision': 0,'type': 10},
+                    {'expression': '"Same_as"','length': 0,'name': 'Same as','precision': 0,'type': 10},
+                    {'expression': '"Equivalent_to"','length': 0,'name': 'Equivalent to','precision': 0,'type': 10},
+                    {'expression': '"Formation"','length': 0,'name': 'Formation','precision': 0,'type': 10},
+                    #
+                    {'expression': '"Enviro_samples"','length': 0,'name': 'Enviro_samples','precision': 0,'type': 10},
+                    {'expression': '"Other_samples"','length': 0,'name': 'Other_samples','precision': 0,'type': 10},
+                    {'expression': '"Finds"','length': 0,'name': 'Finds','precision': 0,'type': 10},
+                    {'expression': '"Small_Finds"','length': 0,'name': 'Small_Finds','precision': 0,'type': 10},
+                    {'expression': '"Provisional_dating"','length': 0,'name': 'Provisional dating','precision': 0,'type': 10},
+                    {'expression': '"Additional_comments"','length': 0,'name': 'Other comments','precision': 0,'type': 10},
+                    #cremation##
+                    {'expression': '"Cremation_type"','length': 0,'name': 'Cremation_type','precision': 0,'type': 10},
+                    {'expression': '"Cremation_truncation"','length': 0,'name': 'Cremation_truncation','precision': 0,'type': 10},
+                    {'expression': '"Urn_Number"','length': 0,'name': 'Urn_Number','precision': 0,'type': 10},
+                    {'expression': '"Crem_grave_goods"','length': 0,'name': 'Crem_grave_goods','precision': 0,'type': 10},
+                    #skeleton
+                    {'expression': '"Head_at"','length': 0,'name': 'Head_at','precision': 0,'type': 10},
+                    {'expression': '"Skeleton_attitude"','length': 0,'name': 'Skeleton_attitude','precision': 0,'type': 10},
+                    {'expression': '"Head"','length': 0,'name': 'Head','precision': 0,'type': 10},
+                    {'expression': '"Right_arm"','length': 0,'name': 'Right_arm','precision': 0,'type': 10},
+                    {'expression': '"Left_arm"','length': 0,'name': 'Left_arm','precision': 0,'type': 10},
+                    {'expression': '"Right_leg"','length': 0,'name': 'Right_leg','precision': 0,'type': 10},
+                    {'expression': '"Left_leg"','length': 0,'name': 'Left_leg','precision': 0,'type': 10},
+                    {'expression': '"Feet"','length': 0,'name': 'Feet','precision': 0,'type': 10},
+                    {'expression': '"Skeleton_preservation"','length': 0,'name': 'Skeleton_preservation','precision': 0,'type': 10},
+                    #coffin            
+                    {'expression': '"Coffin"','length': 0,'name': 'Coffin','precision': 0,'type': 10},
+                    {'expression': '"Coffin_number"','length': 0,'name': 'Coffin number','precision': 0,'type': 10},
+                    {'expression': '"Coffin_Preservation"','length': 0,'name': 'Coffin Preservation','precision': 0,'type': 10},
+                    {'expression': '"Coffin_Description"','length': 0,'name': 'Coffin Description','precision': 0,'type': 10},
+                    {'expression': '"Coffin_Dimensions"','length': 0,'name': 'Coffin Dimensions','precision': 0,'type': 10},
+                    #masonry
+                    {'expression': '"Masonry_structure"','length': 0,'name': 'Masonry_structure','precision': 0,'type': 10},
+                    {'expression': '"Materials"','length': 0,'name': 'Materials','precision': 0,'type': 10},
+                    {'expression': '"Materials_size"','length': 0,'name': 'Materials_size','precision': 0,'type': 10},
+                    {'expression': '"Stones_finish"','length': 0,'name': 'Stones_finish','precision': 0,'type': 10},
+                    {'expression': '"Coursing"','length': 0,'name': 'Coursing','precision': 0,'type': 10},
+                    {'expression': '"Quoins"','length': 0,'name': 'Quoins','precision': 0,'type': 10},
+                    {'expression': '"Form"','length': 0,'name': 'Form','precision': 0,'type': 10},
+                    {'expression': '"Faces"','length': 0,'name': 'Faces','precision': 0,'type': 10},
+                    {'expression': '"Bonding_material"','length': 0,'name': 'Bonding_material','precision': 0,'type': 10},
+                    {'expression': '"Pointing"','length': 0,'name': 'Pointing','precision': 0,'type': 10},
+                    {'expression': '"Masonry_dimensions"','length': 0,'name': 'Masonry_dimensions','precision': 0,'type': 10},
+                    {'expression': '"Associated_contexts"','length': 0,'name': 'Associated_contexts','precision': 0,'type': 10},
+                    #timber
+                    {'expression': '"Timber_structure"','length': 0,'name': 'Timber_structure','precision': 0,'type': 10},
+                    {'expression': '"Timber_type"','length': 0,'name': 'Timber_type','precision': 0,'type': 10},
+                    {'expression': '"Setting"','length': 0,'name': 'Setting','precision': 0,'type': 10},
+                    {'expression': '"Timber_orientation"','length': 0,'name': 'Timber_orientation','precision': 0,'type': 10},
+                    {'expression': '"Cross_section"','length': 0,'name': 'Cross_section','precision': 0,'type': 10},
+                    {'expression': '"Conversion"','length': 0,'name': 'Conversion','precision': 0,'type': 10},
+                    {'expression': '"Condition"','length': 0,'name': 'Condition','precision': 0,'type': 10},
+                    {'expression': '"Timber_dimensions"','length': 0,'name': 'Timber_dimensions','precision': 0,'type': 10},
+                    {'expression': '"Tool_marks"','length': 0,'name': 'Tool_marks','precision': 0,'type': 10},
+                    {'expression': '"Joints_and_fittings"','length': 0,'name': 'Joints_and_fittings','precision': 0,'type': 10},
+                    {'expression': '"Intentional_marks"','length': 0,'name': 'Intentional_marks','precision': 0,'type': 10},
+                    {'expression': '"Surface_treatment"','length': 0,'name': 'Surface_treatment','precision': 0,'type': 10},
+                    #interesting
+                    {'expression': '"Interesting"','length': 0,'name': 'Interesting','precision': 0,'type': 10},
+                    {'expression': '"Interesting_reason"','length': 0,'name': 'Interesting_reason','precision': 0,'type': 10},
+                    #attachments
+                    {'expression': '"Feature_photo"','length': 0,'name': 'Feature_photo','precision': 0,'type': 10},
+                    {'expression': '"Sketch_plan"','length': 0,'name': 'Sketch_plan','precision': 0,'type': 10},
+                    #recording data
+                    {'expression': '"Excavated_by"','length': 0,'name': 'Excavated_by','precision': 0,'type': 10},
+                    {'expression': '"Recorded_by"','length': 0,'name': 'Recorded_by','precision': 0,'type': 10},
+                    {'expression': '"Timestamp"','length': 0,'name': 'Timestamp','precision': 0,'type': 10},
+                    {'expression': '"fid"','length': 0,'name': 'GIS_fid','precision': 0,'type': 2}
+                    ]
+                
+                if table_to_export.name() == 'DRS_Trench_sheet':
+                    DRS_Field_scheme = [
+                    {'expression': "'"+sitecode+"'",'length': 100,'name': 'Site Code','precision': 0,'type': 10},
+                    {'expression': '"Trench_Number"','length': 0,'name': 'Trench Number','precision': 0,'type': 2},
+                    {'expression': '"Trench1_Orientation"','length': 0,'name': 'Alignment','precision': 0,'type': 10},
+                    {'expression': '"Trench_Length"','length': 0,'name': 'Length (m)','precision': 2,'type': 6},
+                    {'expression': '"Trench_Width"','length': 0,'name': 'Width (m)','precision': 2,'type': 6},
+                    {'expression': '"Maximum_trench_depth_(m)"','length': 0,'name': 'Max Machine depth (m)','precision': 3,'type': 6},
+                    ###add an expression to retrieve the level from levels
+                    {'expression': '','length': 0,'name': 'Level of Natural (m OD)','precision': 3,'type': 6},
+                    #not on original table
+                    {'expression': '"Topsoil_description"','length': 0,'name': 'Topsoil_description','precision': 0,'type': 10},
+                    {'expression': '"Subsoil_description"','length': 0,'name': 'Subsoil_description','precision': 0,'type': 10},
+                    {'expression': '"Natural_description"','length': 0,'name': 'Natural_description','precision': 0,'type': 10},
+                    #end1
+                    {'expression': '"End_1_Location"','length': 0,'name': 'End 1 Location','precision': 0,'type': 10}, 
+                    {'expression': '"Topsoil_thickness_End_1_(m)"','length': 0,'name': 'Topsoil thickness End 1 (m)','precision': 0,'type': 10},#ok
+                    {'expression': '"Subsoil_Thickness_End_1_(m)"','length': 0,'name': 'Subsoil Thickness End 1 (m)','precision': 0,'type': 10},
+                    #insert expression
+                    {'expression': '','length': 0,'name': 'Natural depth End 1 (m OD)','precision': 3,'type': 6},
+                    # #end2
+                    {'expression': '"End_2_Location"','length': 0,'name': 'End_2_Location','precision': 0,'type': 10},
+                    {'expression': '"Topsoil_thickness_End_2_(m)"','length': 0,'name': 'Topsoil thickness End 2 (m)','precision': 0,'type': 10},
+                    {'expression': '"Subsoil_Thickness_End_2_(m)"','length': 0,'name': 'Subsoil Thickness End 2 (m)','precision': 0,'type': 10},
+                    #insert expression
+                    {'expression': '','length': 0,'name': 'Natural depth End 2 (m OD)','precision': 3,'type': 6},
+                    {'expression': '"Layers"','length': 0,'name': 'Layers','precision': 0,'type': 10},
+                    #archaeology
+                    {'expression': '"Archaeology_Presence"','length': 0,'name': 'Archaeology Presence','precision': 0,'type': 10},
+                    {'expression': '"Finds"','length': 0,'name': 'Finds','precision': 0,'type': 10},
+                    ########## to check##########
+                    #Create an expression that count the features and retieve the features typology from DRS and count them 
+                    #insert expression
+                    {'expression': '','length': 0,'name': 'Summary of Archaeological Features','precision': 0,'type': 10},
+                    #photos
+                    {'expression': '"DSLR_camera_set_number"','length': 0,'name': 'DSLR camera set number','precision': 0,'type': 10},
+                    {'expression': '"DSLR_photo_numbers"','length': 0,'name': 'DSLR photo numbers','precision': 0,'type': 10},
+                    #attachments
+                    {'expression': '"Trench_photo"','length': 0,'name': 'Trench photo','precision': 0,'type': 10},
+                    {'expression': '"Sketch_plan"','length': 0,'name': 'Sketch plan','precision': 0,'type': 10},
+                    #recorded
+                    {'expression': '"Recorded_by"','length': 0,'name': 'Recorded by','precision': 0,'type': 10},
+                    {'expression': '"Timestamp"','length': 0,'name': 'Timestamp','precision': 0,'type': 10},
+                    {'expression': '"fid"','length': 0,'name': 'GISfid','precision': 0,'type': 6}
+                    ]
+
+
+                
+                #CSVT_list_types = '''"String","Integer","Integer","Integer","String","String""Real","Real","Real","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","Integer"'''
+                
+                CSVT_list_types = []
+                for e in DRS_Field_scheme:
+                    if e["type"] == 2:
+                        CSVT_list_types.append('Integer')
+                    if e["type"] == 6:
+                        CSVT_list_types.append('Real')
+                    if e["type"] == 10:
+                        CSVT_list_types.append('String')
+                    
+                
+                CSVT_list_types_string = (','.join('"' + item + '"' for item in CSVT_list_types))
                 
                 
+                if not os.path.exists(str(path+'/'+filename+'_'+now +'.csvt')):
+                    f = open(str(path+'/'+filename+'_'+now +'.csvt'), "w")
+                    
+                    f.write(CSVT_list_types_string)
+                    f.close() 
+
+                
+
+                processing.runAndLoadResults("native:refactorfields", 
+                {'INPUT':table_to_export,
+                'FIELDS_MAPPING':DRS_Field_scheme,
+              
+                'OUTPUT': str(path+'/'+filename+'_'+now +'.csv')})
+                
+                
+           
+                os.startfile(path)
+                #iface.messageBar().pushMessage('PCA Geomax Survey Processing Plugin:', 'Manually delete the folder "Processed_shapefiles" and re-run the plugin', level=Qgis.Info)   
+                   
+      
+        
+                
+        
     def dontdonothing(self):
-            pass
+        pass
