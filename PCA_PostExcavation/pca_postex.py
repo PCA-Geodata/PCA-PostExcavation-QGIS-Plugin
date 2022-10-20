@@ -91,6 +91,8 @@ class PCA_PostExc:
         self.dlgtool3 = PCA_PostExc_GenerateLayer_Dialog()
         self.dlgtool4 = PCA_PostExc_ExportToAccess_Dialog()
         
+        
+        
         self.toolbar = iface.mainWindow().findChild( QToolBar, u'PCA PostExcavation Toolbar' )
         if not self.toolbar:
             self.toolbar = iface.addToolBar( u'PCA PostExcavation Toolbar' )
@@ -222,6 +224,7 @@ class PCA_PostExc:
         # will be set False in change_attributes()
         self.first_start = True
         
+        
         self.reapply_style= self.add_action( 
             icon_path = ':/plugins/pca_postex/icons/PCA_postex_reapply_style_icon.png',
             text=self.tr(u'Re-apply the Period Colours Style'),
@@ -267,7 +270,7 @@ class PCA_PostExc:
             self.iface.removeToolBarIcon(action)
             
     def group_names_list(self):
-        group_names_list = ['','Ditch', 'Mound', 'Roundhouse','SFB','Structure','Kiln','Corn Dryer','Pond','Well / Waterhole','Bedding Trench','Furrow','Pit Cluster','Pit Alignment','Pit Group','Surface','Fence Line','Inhumation Burial','Cremation Burial','Oven','Deposit']
+        group_names_list = ['','Ditch', 'Mound', 'Roundhouse','SFB','Structure','Kiln','Corn Dryer','Pond','Well / Waterhole','Bedding Trench','Furrow','Pit', 'Rubbish Pit','Pit Cluster','Pit Alignment','Pit Group','Surface','Fence Line','Inhumation Burial','Cremation Burial','Oven','Deposit']
         
         self.dlg.group_name_comboBox.clear()
         self.dlg.group_name_comboBox.addItems(group_names_list)
@@ -279,7 +282,7 @@ class PCA_PostExc:
         self.dlg.entity_name_comboBox.addItems(entity_names_list)
         
     def period_list(self):
-        period_list = ['','Neolithic', 'Bronze Age', 'Iron Age', 'Roman', 'Saxon', 'Medieval', 'Post Medieval', 'Modern']
+        period_list = ['','Neolithic', 'Bronze Age', 'Iron Age', 'Romano-British', 'Anglo-Saxon', 'Medieval', 'Post Medieval', 'Modern']
 
         self.dlg.period_comboBox.clear()
         self.dlg.period_comboBox.addItems(period_list)
@@ -293,9 +296,9 @@ class PCA_PostExc:
         global sub_iron_age_list
         sub_iron_age_list = ['','Early Iron Age','Middle Iron Age','Late Iron Age']
         global sub_roman_list
-        sub_roman_list = ['','Early Roman', 'Middle Roman','Late Roman']
+        sub_roman_list = ['','C1 to Early C2', 'C2 to C3','C3 to C4', 'C4 to C5']
         global sub_saxon_list
-        sub_saxon_list = ['','Early Saxon','Middle Saxon','Late Saxon']
+        sub_saxon_list = ['','Early Anglo-Saxon','Middle Anglo-Saxon','Late Anglo-Saxon']
         global sub_medieval_list
         sub_medieval_list = ['','Anglo-Norman/Early Medieval','High Medieval','Late Medieval']
         global sub_postmedieval_list
@@ -315,11 +318,11 @@ class PCA_PostExc:
             self.dlg.sub_period_comboBox.clear()
             self.dlg.sub_period_comboBox.addItems(sub_iron_age_list)
         
-        if ch_period == 'Roman':
+        if ch_period == 'Romano-British':
             self.dlg.sub_period_comboBox.clear()
             self.dlg.sub_period_comboBox.addItems(sub_roman_list)
         
-        if ch_period == 'Saxon':
+        if ch_period == 'Anglo-Saxon':
             self.dlg.sub_period_comboBox.clear()
             self.dlg.sub_period_comboBox.addItems(sub_saxon_list)
             
@@ -344,7 +347,7 @@ class PCA_PostExc:
             return self.dontdonothing
         else:
             
-            period_list = ['Neolithic', 'Bronze Age', 'Iron Age', 'Roman', 'Saxon', 'Medieval', 'Post Medieval', 'Modern']
+            period_list = ['Neolithic', 'Bronze Age', 'Iron Age', 'Romano-British', 'Anglo-Saxon', 'Medieval', 'Post Medieval', 'Modern']
             ch_period_number = str(period_list.index(ch_period)+1)
 
             ch_period_number_list = []
@@ -489,10 +492,7 @@ class PCA_PostExc:
                 # Run the dialog event loop
                 result = self.dlg.exec_()
                 # See if OK was pressed
-                if result:
-                    # Do something useful here - delete the line containing pass and
-                    # substitute with your code.
-                    
+                if result:                    
                     layer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
                     
                     period = self.dlg.period_comboBox.currentText()
@@ -529,13 +529,29 @@ class PCA_PostExc:
                     
                     phase_field_idx = layer.fields().indexOf('Phase')
                     
+                    
+                    print(len(group_value))
+                    print(len(entity_value))
+                    print(len(period_new_value))
+                    print(len(sub_period_new_value))
+                    print(len(sub_period_number_new_value))
+                    print(len(period_number_new_value))
+                    
+                    
                     layer.startEditing()
                     for feat_id in layer.selectedFeatureIds():
-                        layer.changeAttributeValue(feat_id, period_field_idx, period_new_value)
-                        layer.changeAttributeValue(feat_id, sub_period_field_idx, sub_period_new_value)
+                                  
+                        if len(period_new_value) != 0:
+                            layer.changeAttributeValue(feat_id, period_field_idx, period_new_value)
+                        
+                        if len(sub_period_new_value) != 0:
+                            layer.changeAttributeValue(feat_id, sub_period_field_idx, sub_period_new_value)
                        
-                        layer.changeAttributeValue(feat_id, period_number_field_idx, period_number_new_value)
-                        layer.changeAttributeValue(feat_id, sub_period_number_field_idx, sub_period_number_new_value)
+                        if len(period_number_new_value) != 0:
+                            layer.changeAttributeValue(feat_id, period_number_field_idx, period_number_new_value)
+                        
+                        if len(sub_period_number_new_value) != 0:
+                            layer.changeAttributeValue(feat_id, sub_period_number_field_idx, sub_period_number_new_value)
                        
                         # if len(group_value) < 2:
                             # return self.dontdonothing()
@@ -555,13 +571,21 @@ class PCA_PostExc:
                             #for feat_id in layer.selectedFeatureIds():
                             layer.changeAttributeValue(feat_id, phase_field_idx, phase)
                             
+                            
 
                     layer.commitChanges()
                     layer.removeSelection()
                     self.dlg.group_number_comboBox.clear()
                     self.dlg.group_name_comboBox.clear()   
                     self.dlg.entity_number_comboBox.clear()
+                    self.dlg.period_number_comboBox.clear()
+                    self.dlg.period_comboBox.clear() 
+                    self.dlg.sub_period_comboBox.clear() 
+                    self.dlg.subperiod_number_comboBox.clear() 
                     self.dlg.entity_name_comboBox.clear() 
+                    self.dlg.phase_comboBox.clear() 
+                    
+                    
     
     def generate_postex_layer(self):
         if self.first_start == True:
@@ -973,6 +997,14 @@ class PCA_PostExc:
                 if("Significant_ Inclusions" is not null, ' with ', ''),lower("Significant_ Inclusions")))
                 '''
                 
+                finds_pottery_check = '''if("Finds" ilike '%pottery%', 'yes','')'''
+                finds_bone_check = '''if("Finds" ilike '%Animal Bone%', 'yes','')'''
+                finds_flint_check = '''if("Finds" ilike '%flint%', 'yes','')'''
+                
+                
+                interpretation_field = '''concat( "Interpretation","Formation")'''
+                
+                
                 if table_to_export.name() == 'DRS_Table':
                     DRS_Field_scheme = [
                     ##add sitecode as first field
@@ -986,17 +1018,17 @@ class PCA_PostExc:
                     {'expression': '"Width"','length': 0,'name': 'Width (m)','precision': 3,'type': 6},
                     {'expression': '"Depth"','length': 0,'name': 'Depth (m)','precision': 3,'type': 6},
                     {'expression': '"Plan"','length': 0,'name': 'Plan','precision': 0,'type': 10},
-                    {'expression': '"Section_Sheet"','length': 0,'name': 'Section Sheet','precision': 0,'type': 10},
+                    # {'expression': '"Section_Sheet"','length': 0,'name': 'Section Sheet','precision': 0,'type': 10},
                     {'expression': '"Section"','length': 0,'name': 'Section','precision': 0,'type': 10},
                     {'expression': '"Additional_Sections"','length': 0,'name': 'Additional Sections','precision': 0,'type': 10},
                     #create a Description Field that sum all description fields (long field)
                     {'expression': combined_description_express,'length': 255,'name': 'Description','precision': 0,'type': 10},
                     #
-                    {'expression': '"Stratigraphically_above"','length': 0,'name': 'Stratigraphically_above','precision': 0,'type': 10},
-                    {'expression': '"Stratigraphically_below"','length': 0,'name': 'Stratigraphically_below','precision': 0,'type': 10},
+                    # {'expression': '"Stratigraphically_above"','length': 0,'name': 'Stratigraphically_above','precision': 0,'type': 10},
+                    # {'expression': '"Stratigraphically_below"','length': 0,'name': 'Stratigraphically_below','precision': 0,'type': 10},
                     #photos
-                    {'expression': '"Camera_set_number"','length': 0,'name': 'Camera Set Number','precision': 0,'type': 10},
-                    {'expression': '"Photo_numbers"','length': 0,'name': 'Photo Numbers','precision': 0,'type': 10},
+                    # {'expression': '"Camera_set_number"','length': 0,'name': 'Camera Set Number','precision': 0,'type': 10},
+                    # {'expression': '"Photo_numbers"','length': 0,'name': 'Photo Numbers','precision': 0,'type': 10},
                     #used for cut description. Keep them? Add a selectable option
                     # {'expression': '"Shape"','length': 0,'name': 'Shape','precision': 0,'type': 10},
                     # {'expression': '"Sides"','length': 0,'name': 'Sides','precision': 0,'type': 10},
@@ -1005,16 +1037,29 @@ class PCA_PostExc:
                     #
                     {'expression': '"Cuts"','length': 0,'name': 'Cuts','precision': 0,'type': 10},
                     {'expression': '"Cut_by"','length': 0,'name': 'Cut by','precision': 0,'type': 10},
-                    {'expression': '"Number_of_fills"','length': 0,'name': 'Number of fills','precision': 0,'type': 10},
-                    {'expression': '"Interpretation"','length': 0,'name': 'Interpretation','precision': 0,'type': 10},
+                    {'expression': '"Fill_Sequence"','length': 0,'name': 'Fill Sequence','precision': 0,'type': 10},
+                    # {'expression': '"Number_of_fills"','length': 0,'name': 'Number of fills','precision': 0,'type': 10},
+                    # {'expression': '"Interpretation"','length': 0,'name': 'Interpretation','precision': 0,'type': 10},
+                    {'expression': '"Enviro_samples"','length': 0,'name': 'Enviro Sample','precision': 0,'type': 10},
+                    {'expression': finds_flint_check,'length': 0,'name': 'Flint','precision': 0,'type': 10},
+                    {'expression': finds_pottery_check,'length': 0,'name': 'Pottery','precision': 0,'type': 10},
+                    {'expression': finds_bone_check,'length': 0,'name': 'Bone','precision': 0,'type': 10},
+                    {'expression': '"Small_Finds"','length': 0,'name': 'Other significant finds','precision': 0,'type': 10},
+                    {'expression': interpretation_field,'length': 0,'name': 'Interpretation','precision': 0,'type': 10},
                     #postex data
-                    {'expression': '"Group"','length': 254,'name': 'Group','precision': 0,'type': 10},
+                    {'expression': '','length': 254,'name': 'Feature Name','precision': 0,'type': 10},
+                    {'expression': '"Group"','length': 254,'name': 'Group Name','precision': 0,'type': 10},
                     {'expression': '"Entity"','length': 254,'name': 'Entity','precision': 0,'type': 10},
-                    {'expression': '"Period"','length': 254,'name': 'Period','precision': 0,'type': 10},
-                    {'expression': '"Period Number"','length': 254,'name': 'Period Number','precision': 0,'type': 10},
-                    {'expression': '"Sub Period"','length': 254,'name': 'Sub-Period','precision': 0,'type': 10},
+                    {'expression': '"Sub Period"','length': 254,'name': 'Sub-Period Name','precision': 0,'type': 10},
                     {'expression': '"Sub Period Number"','length': 254,'name': 'Sub-Period Number','precision': 0,'type': 10},
+                    {'expression': '"Period"','length': 254,'name': 'Period Name','precision': 0,'type': 10},
+                    {'expression': '"Period Number"','length': 254,'name': 'Period Number','precision': 0,'type': 10},
+                    
                     {'expression': '"Phase"','length': 254,'name': 'Phase','precision': 0,'type': 10},
+                    {'expression': '"Additional_comments"','length': 0,'name': 'Other Comments','precision': 0,'type': 10},
+                    
+                    
+                    
                     # used for fill description. Keep them? Add a selectable option
                     # {'expression': '"Compaction"','length': 0,'name': 'Compaction','precision': 0,'type': 10},
                     # {'expression': '"Tone"','length': 0,'name': 'Tone','precision': 0,'type': 10},
@@ -1023,75 +1068,75 @@ class PCA_PostExc:
                     # {'expression': '"Composition"','length': 0,'name': 'Composition','precision': 0,'type': 10},
                     # {'expression': '"Significant_ Inclusions"','length': 0,'name': 'Significant_ Inclusions','precision': 0,'type': 10},
                     #
-                    {'expression': '"Fill_Sequence"','length': 0,'name': 'Fill Sequence','precision': 0,'type': 10},
-                    {'expression': '"Same_as"','length': 0,'name': 'Same as','precision': 0,'type': 10},
-                    {'expression': '"Equivalent_to"','length': 0,'name': 'Equivalent to','precision': 0,'type': 10},
-                    {'expression': '"Formation"','length': 0,'name': 'Formation','precision': 0,'type': 10},
-                    #
-                    {'expression': '"Enviro_samples"','length': 0,'name': 'Enviro_samples','precision': 0,'type': 10},
-                    {'expression': '"Other_samples"','length': 0,'name': 'Other_samples','precision': 0,'type': 10},
-                    {'expression': '"Finds"','length': 0,'name': 'Finds','precision': 0,'type': 10},
-                    {'expression': '"Small_Finds"','length': 0,'name': 'Small_Finds','precision': 0,'type': 10},
-                    {'expression': '"Provisional_dating"','length': 0,'name': 'Provisional dating','precision': 0,'type': 10},
-                    {'expression': '"Additional_comments"','length': 0,'name': 'Other comments','precision': 0,'type': 10},
-                    #cremation##
-                    {'expression': '"Cremation_type"','length': 0,'name': 'Cremation_type','precision': 0,'type': 10},
-                    {'expression': '"Cremation_truncation"','length': 0,'name': 'Cremation_truncation','precision': 0,'type': 10},
-                    {'expression': '"Urn_Number"','length': 0,'name': 'Urn_Number','precision': 0,'type': 10},
-                    {'expression': '"Crem_grave_goods"','length': 0,'name': 'Crem_grave_goods','precision': 0,'type': 10},
-                    #skeleton
-                    {'expression': '"Head_at"','length': 0,'name': 'Head_at','precision': 0,'type': 10},
-                    {'expression': '"Skeleton_attitude"','length': 0,'name': 'Skeleton_attitude','precision': 0,'type': 10},
-                    {'expression': '"Head"','length': 0,'name': 'Head','precision': 0,'type': 10},
-                    {'expression': '"Right_arm"','length': 0,'name': 'Right_arm','precision': 0,'type': 10},
-                    {'expression': '"Left_arm"','length': 0,'name': 'Left_arm','precision': 0,'type': 10},
-                    {'expression': '"Right_leg"','length': 0,'name': 'Right_leg','precision': 0,'type': 10},
-                    {'expression': '"Left_leg"','length': 0,'name': 'Left_leg','precision': 0,'type': 10},
-                    {'expression': '"Feet"','length': 0,'name': 'Feet','precision': 0,'type': 10},
-                    {'expression': '"Skeleton_preservation"','length': 0,'name': 'Skeleton_preservation','precision': 0,'type': 10},
-                    #coffin            
-                    {'expression': '"Coffin"','length': 0,'name': 'Coffin','precision': 0,'type': 10},
-                    {'expression': '"Coffin_number"','length': 0,'name': 'Coffin number','precision': 0,'type': 10},
-                    {'expression': '"Coffin_Preservation"','length': 0,'name': 'Coffin Preservation','precision': 0,'type': 10},
-                    {'expression': '"Coffin_Description"','length': 0,'name': 'Coffin Description','precision': 0,'type': 10},
-                    {'expression': '"Coffin_Dimensions"','length': 0,'name': 'Coffin Dimensions','precision': 0,'type': 10},
-                    #masonry
-                    {'expression': '"Masonry_structure"','length': 0,'name': 'Masonry_structure','precision': 0,'type': 10},
-                    {'expression': '"Materials"','length': 0,'name': 'Materials','precision': 0,'type': 10},
-                    {'expression': '"Materials_size"','length': 0,'name': 'Materials_size','precision': 0,'type': 10},
-                    {'expression': '"Stones_finish"','length': 0,'name': 'Stones_finish','precision': 0,'type': 10},
-                    {'expression': '"Coursing"','length': 0,'name': 'Coursing','precision': 0,'type': 10},
-                    {'expression': '"Quoins"','length': 0,'name': 'Quoins','precision': 0,'type': 10},
-                    {'expression': '"Form"','length': 0,'name': 'Form','precision': 0,'type': 10},
-                    {'expression': '"Faces"','length': 0,'name': 'Faces','precision': 0,'type': 10},
-                    {'expression': '"Bonding_material"','length': 0,'name': 'Bonding_material','precision': 0,'type': 10},
-                    {'expression': '"Pointing"','length': 0,'name': 'Pointing','precision': 0,'type': 10},
-                    {'expression': '"Masonry_dimensions"','length': 0,'name': 'Masonry_dimensions','precision': 0,'type': 10},
-                    {'expression': '"Associated_contexts"','length': 0,'name': 'Associated_contexts','precision': 0,'type': 10},
-                    #timber
-                    {'expression': '"Timber_structure"','length': 0,'name': 'Timber_structure','precision': 0,'type': 10},
-                    {'expression': '"Timber_type"','length': 0,'name': 'Timber_type','precision': 0,'type': 10},
-                    {'expression': '"Setting"','length': 0,'name': 'Setting','precision': 0,'type': 10},
-                    {'expression': '"Timber_orientation"','length': 0,'name': 'Timber_orientation','precision': 0,'type': 10},
-                    {'expression': '"Cross_section"','length': 0,'name': 'Cross_section','precision': 0,'type': 10},
-                    {'expression': '"Conversion"','length': 0,'name': 'Conversion','precision': 0,'type': 10},
-                    {'expression': '"Condition"','length': 0,'name': 'Condition','precision': 0,'type': 10},
-                    {'expression': '"Timber_dimensions"','length': 0,'name': 'Timber_dimensions','precision': 0,'type': 10},
-                    {'expression': '"Tool_marks"','length': 0,'name': 'Tool_marks','precision': 0,'type': 10},
-                    {'expression': '"Joints_and_fittings"','length': 0,'name': 'Joints_and_fittings','precision': 0,'type': 10},
-                    {'expression': '"Intentional_marks"','length': 0,'name': 'Intentional_marks','precision': 0,'type': 10},
-                    {'expression': '"Surface_treatment"','length': 0,'name': 'Surface_treatment','precision': 0,'type': 10},
-                    #interesting
-                    {'expression': '"Interesting"','length': 0,'name': 'Interesting','precision': 0,'type': 10},
-                    {'expression': '"Interesting_reason"','length': 0,'name': 'Interesting_reason','precision': 0,'type': 10},
-                    #attachments
-                    {'expression': '"Feature_photo"','length': 0,'name': 'Feature_photo','precision': 0,'type': 10},
-                    {'expression': '"Sketch_plan"','length': 0,'name': 'Sketch_plan','precision': 0,'type': 10},
-                    #recording data
-                    {'expression': '"Excavated_by"','length': 0,'name': 'Excavated_by','precision': 0,'type': 10},
-                    {'expression': '"Recorded_by"','length': 0,'name': 'Recorded_by','precision': 0,'type': 10},
-                    {'expression': '"Timestamp"','length': 0,'name': 'Timestamp','precision': 0,'type': 10},
-                    {'expression': '"fid"','length': 0,'name': 'GIS_fid','precision': 0,'type': 2}
+                    
+                    # {'expression': '"Same_as"','length': 0,'name': 'Same as','precision': 0,'type': 10},
+                    # {'expression': '"Equivalent_to"','length': 0,'name': 'Equivalent to','precision': 0,'type': 10},
+                    # {'expression': '"Formation"','length': 0,'name': 'Formation','precision': 0,'type': 10},
+                    # #
+                    
+                    # {'expression': '"Other_samples"','length': 0,'name': 'Other_samples','precision': 0,'type': 10},
+                    # {'expression': '"Finds"','length': 0,'name': 'Finds','precision': 0,'type': 10},
+                    
+                    # {'expression': '"Provisional_dating"','length': 0,'name': 'Provisional dating','precision': 0,'type': 10},
+                    
+                    # #cremation##
+                    # {'expression': '"Cremation_type"','length': 0,'name': 'Cremation_type','precision': 0,'type': 10},
+                    # {'expression': '"Cremation_truncation"','length': 0,'name': 'Cremation_truncation','precision': 0,'type': 10},
+                    # {'expression': '"Urn_Number"','length': 0,'name': 'Urn_Number','precision': 0,'type': 10},
+                    # {'expression': '"Crem_grave_goods"','length': 0,'name': 'Crem_grave_goods','precision': 0,'type': 10},
+                    # #skeleton
+                    # {'expression': '"Head_at"','length': 0,'name': 'Head_at','precision': 0,'type': 10},
+                    # {'expression': '"Skeleton_attitude"','length': 0,'name': 'Skeleton_attitude','precision': 0,'type': 10},
+                    # {'expression': '"Head"','length': 0,'name': 'Head','precision': 0,'type': 10},
+                    # {'expression': '"Right_arm"','length': 0,'name': 'Right_arm','precision': 0,'type': 10},
+                    # {'expression': '"Left_arm"','length': 0,'name': 'Left_arm','precision': 0,'type': 10},
+                    # {'expression': '"Right_leg"','length': 0,'name': 'Right_leg','precision': 0,'type': 10},
+                    # {'expression': '"Left_leg"','length': 0,'name': 'Left_leg','precision': 0,'type': 10},
+                    # {'expression': '"Feet"','length': 0,'name': 'Feet','precision': 0,'type': 10},
+                    # {'expression': '"Skeleton_preservation"','length': 0,'name': 'Skeleton_preservation','precision': 0,'type': 10},
+                    # #coffin            
+                    # {'expression': '"Coffin"','length': 0,'name': 'Coffin','precision': 0,'type': 10},
+                    # {'expression': '"Coffin_number"','length': 0,'name': 'Coffin number','precision': 0,'type': 10},
+                    # {'expression': '"Coffin_Preservation"','length': 0,'name': 'Coffin Preservation','precision': 0,'type': 10},
+                    # {'expression': '"Coffin_Description"','length': 0,'name': 'Coffin Description','precision': 0,'type': 10},
+                    # {'expression': '"Coffin_Dimensions"','length': 0,'name': 'Coffin Dimensions','precision': 0,'type': 10},
+                    # #masonry
+                    # {'expression': '"Masonry_structure"','length': 0,'name': 'Masonry_structure','precision': 0,'type': 10},
+                    # {'expression': '"Materials"','length': 0,'name': 'Materials','precision': 0,'type': 10},
+                    # {'expression': '"Materials_size"','length': 0,'name': 'Materials_size','precision': 0,'type': 10},
+                    # {'expression': '"Stones_finish"','length': 0,'name': 'Stones_finish','precision': 0,'type': 10},
+                    # {'expression': '"Coursing"','length': 0,'name': 'Coursing','precision': 0,'type': 10},
+                    # {'expression': '"Quoins"','length': 0,'name': 'Quoins','precision': 0,'type': 10},
+                    # {'expression': '"Form"','length': 0,'name': 'Form','precision': 0,'type': 10},
+                    # {'expression': '"Faces"','length': 0,'name': 'Faces','precision': 0,'type': 10},
+                    # {'expression': '"Bonding_material"','length': 0,'name': 'Bonding_material','precision': 0,'type': 10},
+                    # {'expression': '"Pointing"','length': 0,'name': 'Pointing','precision': 0,'type': 10},
+                    # {'expression': '"Masonry_dimensions"','length': 0,'name': 'Masonry_dimensions','precision': 0,'type': 10},
+                    # {'expression': '"Associated_contexts"','length': 0,'name': 'Associated_contexts','precision': 0,'type': 10},
+                    # #timber
+                    # {'expression': '"Timber_structure"','length': 0,'name': 'Timber_structure','precision': 0,'type': 10},
+                    # {'expression': '"Timber_type"','length': 0,'name': 'Timber_type','precision': 0,'type': 10},
+                    # {'expression': '"Setting"','length': 0,'name': 'Setting','precision': 0,'type': 10},
+                    # {'expression': '"Timber_orientation"','length': 0,'name': 'Timber_orientation','precision': 0,'type': 10},
+                    # {'expression': '"Cross_section"','length': 0,'name': 'Cross_section','precision': 0,'type': 10},
+                    # {'expression': '"Conversion"','length': 0,'name': 'Conversion','precision': 0,'type': 10},
+                    # {'expression': '"Condition"','length': 0,'name': 'Condition','precision': 0,'type': 10},
+                    # {'expression': '"Timber_dimensions"','length': 0,'name': 'Timber_dimensions','precision': 0,'type': 10},
+                    # {'expression': '"Tool_marks"','length': 0,'name': 'Tool_marks','precision': 0,'type': 10},
+                    # {'expression': '"Joints_and_fittings"','length': 0,'name': 'Joints_and_fittings','precision': 0,'type': 10},
+                    # {'expression': '"Intentional_marks"','length': 0,'name': 'Intentional_marks','precision': 0,'type': 10},
+                    # {'expression': '"Surface_treatment"','length': 0,'name': 'Surface_treatment','precision': 0,'type': 10},
+                    # #interesting
+                    # {'expression': '"Interesting"','length': 0,'name': 'Interesting','precision': 0,'type': 10},
+                    # {'expression': '"Interesting_reason"','length': 0,'name': 'Interesting_reason','precision': 0,'type': 10},
+                    # #attachments
+                    # {'expression': '"Feature_photo"','length': 0,'name': 'Feature_photo','precision': 0,'type': 10},
+                    # {'expression': '"Sketch_plan"','length': 0,'name': 'Sketch_plan','precision': 0,'type': 10},
+                    # #recording data
+                    # {'expression': '"Excavated_by"','length': 0,'name': 'Excavated_by','precision': 0,'type': 10},
+                    # {'expression': '"Recorded_by"','length': 0,'name': 'Recorded_by','precision': 0,'type': 10},
+                    # {'expression': '"Timestamp"','length': 0,'name': 'Timestamp','precision': 0,'type': 10},
+                    # {'expression': '"fid"','length': 0,'name': 'GIS_fid','precision': 0,'type': 2}
                     ]
                 
                 if table_to_export.name() == 'DRS_Trench_sheet':
@@ -1165,7 +1210,7 @@ class PCA_PostExc:
 
                 
 
-                processing.runAndLoadResults("native:refactorfields", 
+                processing.run("native:refactorfields", 
                 {'INPUT':table_to_export,
                 'FIELDS_MAPPING':DRS_Field_scheme,
               
