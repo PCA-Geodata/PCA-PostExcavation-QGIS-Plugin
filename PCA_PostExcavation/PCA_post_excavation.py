@@ -1235,7 +1235,7 @@ class PCAPostExcavation:
         else: 
             restyle_layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
             restyle_layer.loadNamedStyle(os.path.join(os.path.join(cmd_folder, 'qml/PCA_PostExcavation_Groups_Style.qml')))    
-            iface.mapCanvas().refresh()
+            
             
             root = QgsProject.instance().layerTreeRoot()
             myLayerNode = root.findLayer(restyle_layer.id())
@@ -1244,13 +1244,17 @@ class PCAPostExcavation:
             self.dlgtool6.groups_radioButton.setAutoExclusive(False)
             self.dlgtool6.groups_radioButton.setChecked(False)
             
+            restyle_layer.triggerRepaint()
+            restyle_layer.emitStyleChanged()            
+            iface.mapCanvas().refresh()
+            
     def reapply_period_style(self):
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
             return self.dontdonothing
         else: 
             restyle_layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
             restyle_layer.loadNamedStyle(os.path.join(os.path.join(cmd_folder, 'qml/PCA_PostExcavation_Features_Style.qml')))    
-            iface.mapCanvas().refresh()
+            
             
             root = QgsProject.instance().layerTreeRoot()
             myLayerNode = root.findLayer(restyle_layer.id())
@@ -1258,6 +1262,11 @@ class PCAPostExcavation:
             
             self.dlgtool6.full_periods_radioButton.setAutoExclusive(False)
             self.dlgtool6.full_periods_radioButton.setChecked(False)
+            
+            restyle_layer.triggerRepaint()
+            restyle_layer.emitStyleChanged()            
+            iface.mapCanvas().refresh()
+            
 
     def clean_empty_rules(self):
     
@@ -1285,8 +1294,8 @@ class PCAPostExcavation:
 
             restyle_layer.triggerRepaint() 
             iface.layerTreeView().refreshLayerSymbology( restyle_layer.id() )
-            iface.mapCanvas().refresh()
             restyle_layer.emitStyleChanged()
+            iface.mapCanvas().refresh()
             
             self.dlgtool6.filtered_periods_radioButton.setAutoExclusive(False)
             self.dlgtool6.filtered_periods_radioButton.setChecked(False)
@@ -1376,9 +1385,9 @@ class PCAPostExcavation:
 
             # Refresh layer
             layer.triggerRepaint()
-            iface.mapCanvas().refresh()
             iface.layerTreeView().refreshLayerSymbology( layer.id() )
             layer.emitStyleChanged()
+            iface.mapCanvas().refresh()
             
             
             root = QgsProject.instance().layerTreeRoot()
@@ -1426,13 +1435,10 @@ class PCAPostExcavation:
                 progressMessageBar.layout().addWidget(progress)
                 iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
                 
-                
-                
                 progress.setValue(0)
-                
+  
                 
                 #check if the group exists and, if not, create it
-                
                 caps = intervention_DRS_layer.dataProvider().capabilities()    
                 resadd = intervention_DRS_layer.dataProvider()
                             
@@ -1451,8 +1457,7 @@ class PCAPostExcavation:
                 #############################
 
                 #add the attributes to Intervention from Features_for_PostEx
-                
-                
+
                 intervention_DRS_layer.startEditing()
 
                 for group_name in group_field_name_list:
@@ -1506,8 +1511,6 @@ class PCAPostExcavation:
                 QMessageBox.about(None,'PCA PostExcavation Plugin', 'The Intervention layer has been successfully updated.') 
 
     def from_intervention_to_DRS(self):
-       
-
         # show the dialog
         self.dlgtool5.show()
         # Run the dialog event loop
@@ -1526,10 +1529,7 @@ class PCAPostExcavation:
                 return self.dontdonothing()
                 
             if len(QgsProject.instance().mapLayersByName('Interventions')) != 0:
-            
-            
-               
-            
+
                 #Create progress bar
                 progressMessageBar = iface.messageBar().createMessage("DRS is being updated...")
                 progress = QProgressBar()
@@ -1854,14 +1854,3 @@ class PCAPostExcavation:
                 
     def dontdonothing(self):
         pass
-
-
-
-
-
-
-
-
-
-
-    
