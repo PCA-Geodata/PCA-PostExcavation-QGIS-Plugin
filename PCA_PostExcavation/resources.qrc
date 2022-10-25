@@ -1,6 +1,6 @@
 <RCC>
-    <qresource prefix="/plugins/pca_postex" >
-        <file>icons/PCA_postex_icon.png</file>
+    <qresource prefix="/plugins/pca_post_excavation" >
+		<file>icons/PCA_postex_icon.png</file>
 		<file>icons/PCA_postex_layer_generator_icon.png</file>
 		<file>icons/pca_logo_icon.png</file>
 		<file>icons/PCA_postex_reapply_style_icon.png</file>
@@ -8,5 +8,6 @@
 		<file>icons/PCA_postex_update_DRS_icon.png</file>
 		<file>icons/PCA_postex_clean_rules_icon.png</file>
 		<file>icons/PCA_postex_export_to_access_icon.png</file>
-		</qresource>
+		<file>icons/PCA_postex_update_Intervention_icon.png</file>		
+	</qresource>
 </RCC>

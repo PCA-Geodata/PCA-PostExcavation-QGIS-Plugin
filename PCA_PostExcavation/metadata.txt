@@ -3,18 +3,19 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=PCA Post-excavation
+name=PCA Post Excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=1.27
-author=Valerio Pinna
+version=2.0
+author=Valerio Pinna (Pre-Construct Archaeology)
 email=vpinna@pre-construct.com
 
 about=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase.
 	
 
-	  It is a component of the new DRS/GIS integrated data management system, and provides a set of tool that help definings groups, entities, periods, sub-periods and phases for all the archeological features.
+	  It is a component of the new DRS/GIS integrated data management system, and provides a set of tools that help definings groups, entities, periods, sub-periods and phases for all the archeological features.
 	  
+
 tracker=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin/issues
 repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 # End of mandatory metadata
@@ -23,7 +24,7 @@ repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-# changelog= 
+# changelog=
 
 # Tags are comma separated with spaces allowed
 tags=PCA, python, archaeology, post-excavation, phasing, grouping, periods

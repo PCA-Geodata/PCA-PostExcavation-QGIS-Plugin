@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>433</width>
-    <height>360</height>
+    <width>352</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,6 +18,18 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>352</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>352</width>
+    <height>300</height>
+   </size>
   </property>
   <property name="palette">
    <palette>
@@ -90,9 +102,6 @@
    <string>PCA PostExcavation Plugin</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="sizeConstraint">
-    <enum>QLayout::SetFixedSize</enum>
-   </property>
    <item row="0" column="0">
     <widget class="QPushButton" name="pushButton">
      <property name="sizePolicy">
@@ -438,39 +447,28 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>330</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>330</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <pointsize>8</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;
-&lt;head/&gt;
-&lt;style&gt;
-.emphasized { font-style: italic; }
-&lt;/style&gt;
-
-&lt;body&gt;
-&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;span&gt;
-&lt;p&gt;
-&lt;p&gt;This action updates the DRS spreadsheet with the post-excavation &lt;/p&gt;data 
-currently stored on the layer &lt;span class=&quot;emphasized&quot;&gt;'Features for PostEx'&lt;/span&gt;.
-
-&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
-&lt;p&gt;All the previous post-excavation data stored in the DRS Spreadsheet &lt;/p&gt;will be overwritten. 
-&lt;br/&gt;&lt;br/&gt;
-&lt;p&gt;	Do you want to continue? &lt;/p&gt;
-&lt;/p&gt;
-&lt;/span&gt;
-
-
-&lt;/body&gt;
-&lt;/html&gt;
-
-
-
-</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;This action updates the DRS spreadsheet with the post-excavation data currently stored on the layer &lt;span style=&quot; font-style:italic;&quot;&gt;Interventions&lt;/span&gt;. &lt;br/&gt;&lt;br/&gt;All the previous post-excavation data stored in the DRS Spreadsheet &lt;/p&gt;&lt;p&gt;will be overwritten. &lt;br/&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Do you want to continue? &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
