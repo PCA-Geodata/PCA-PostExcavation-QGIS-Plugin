@@ -57,7 +57,7 @@ from .pca_postex_generate_layer_dialog import PCA_PostExc_GenerateLayer_Dialog
 from .pca_postex_export_to_access_dialog import PCA_PostExc_ExportToAccess_Dialog
 from .pca_postex_update_Interventions_dialog import PCA_PostExc_updateInterventions_Dialog
 from .pca_postex_choose_style_dialog import PCA_PostExc_ChooseStyle_Dialog
-
+from .pca_postex_ChooseDRSUpdateStep_dialog import PCA_PostExc_ChooseDRSUpdateStep_Dialog
 
 first_use = []
 cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
@@ -119,7 +119,8 @@ class PCAPostExcavation:
         self.dlgtool4 = PCA_PostExc_ExportToAccess_Dialog()
         self.dlgtool5 = PCA_PostExc_updateDRS_Dialog()
         self.dlgtool6 = PCA_PostExc_ChooseStyle_Dialog()
-        
+        self.dlgtool7 = PCA_PostExc_ChooseDRSUpdateStep_Dialog()
+                        
         
         
         self.toolbar = iface.mainWindow().findChild( QToolBar, u'PCA PostExcavation Toolbar' )
@@ -260,7 +261,6 @@ class PCAPostExcavation:
         # will be set False in change_attributes()
         self.first_start = True
         
-        
         self.reapply_style= self.add_action( 
             icon_path = ':/plugins/pca_post_excavation/icons/PCA_postex_reapply_style_icon.png',
             text=self.tr(u'Select the style for the Features_for_PostEx layer'),
@@ -268,23 +268,14 @@ class PCAPostExcavation:
             parent=self.iface.mainWindow())     
         # will be set False in change_attributes()
         self.first_start = True
-        
-        self.updateInterventions= self.add_action( 
-            icon_path = ':/plugins/pca_post_excavation/icons/PCA_postex_update_Intervention_icon.png',
-            text=self.tr(u'Update the Intervention Layer with the post-excavation informations'),
-            callback=self.update_intervention_from_features,
-            parent=self.iface.mainWindow())     
-        # will be set False in change_attributes()
-        self.first_start = True
-        
+   
         self.updateDRS= self.add_action( 
             icon_path = ':/plugins/pca_post_excavation/icons/PCA_postex_update_DRS_icon.png',
-            text=self.tr(u'Update the DRS spreadsheet with the Intervention information'),
-            callback=self.from_intervention_to_DRS,
+            text=self.tr(u'Update the Interventions and the DRS table from the Features_for_postex attribute data'),
+            callback=self.choose_DRS_update_step,
             parent=self.iface.mainWindow())     
         # will be set False in change_attributes()
         self.first_start = True
-        
         
         self.exportforAccess= self.add_action( 
             icon_path = ':/plugins/pca_post_excavation/icons/PCA_postex_export_to_access_icon.png',
@@ -296,8 +287,6 @@ class PCAPostExcavation:
         
         # # will be set False in run()
         # self.first_start = True
-        
-    #--------------------------------------------------------------------------
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
@@ -315,7 +304,6 @@ class PCAPostExcavation:
 
         self.pluginIsActive = False
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
 
@@ -329,8 +317,6 @@ class PCAPostExcavation:
         # remove the toolbar
         del self.toolbar
 
-    #--------------------------------------------------------------------------
-
     def group_names_list(self):
         #group_names_list = ['','Ditch', 'Mound', 'Roundhouse','SFB','Structure','Kiln','Corn Dryer','Pond','Well','Waterhole','Bedding Trench','Furrow','Pit Cluster','Pit Alignment','Pit Group','Surface','Fence Line','Inhumation Burial','Cremation Burial','Oven','Deposit']
         
@@ -339,7 +325,6 @@ class PCAPostExcavation:
         
         self.dockwidget.group_name_comboBox_2.clear()
         self.dockwidget.group_name_comboBox_2.addItems(group_names_list)
-        
         
     def entity_names_list(self):
         # entity_names_list = ['','Cemetery','Field System','Enclosure', 'Linear Boundary','Road/Trackway','Monument', 'Palaeochannel' ]
@@ -491,8 +476,7 @@ class PCAPostExcavation:
             used_group_list.clear()
             filtered_list.clear()
             current_value.clear()
-            
-            
+             
     def change_entity_number(self, ch_entity_name):
         
         vlayer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
@@ -532,7 +516,6 @@ class PCAPostExcavation:
             entity_filtered_list.clear()
             entity_current_value.clear()
                                   
-
     def generate_postex_layer(self):
         if self.first_start == True:
             self.first_start = False
@@ -762,7 +745,6 @@ class PCAPostExcavation:
     def open_pdf_chronology(self):
         webbrowser.open_new(r'file://C:\Users\vpinna\AppData\Roaming\QGIS\QGIS3\profiles\PCA_Default\python\plugins\pca_post_excavation\resources\PCA_Chronological Period Table_2022_01.pdf')
        
-        
     def configure_dock(self):
                 
         self.period_list()
@@ -820,16 +802,6 @@ class PCAPostExcavation:
                         return self.activate_apply_button()
                     else:
                         self.dockwidget.setEnabled(False)               
-    
-    # def activate_apply_button(self, selected_ids):
-    
-        # if len(selected_ids) != 0:
-            # self.dockwidget.apply_attribute_pushButton.setEnabled(True)
-            # return self.retrievevalues()    
-        
-        # if len(selected_ids) == 0:
-            # self.dockwidget.apply_attribute_pushButton.setEnabled(False)
-            # return self.clean_attributes()
             
     def activate_apply_button(self):
         layers_list = QgsProject.instance().mapLayers()
@@ -848,7 +820,6 @@ class PCAPostExcavation:
                             self.dockwidget.apply_attribute_pushButton.setEnabled(False)
                             return self.clean_attributes()
                    
-
     def cleancomboBoxColour(self):
         self.dockwidget.group_number_comboBox_2.setStyleSheet("QComboBox"
                                                                  "{"
@@ -966,8 +937,6 @@ class PCAPostExcavation:
             if len(phase) != 0:
                 #for feat_id in layer.selectedFeatureIds():
                 layer.changeAttributeValue(feat_id, phase_field_idx, phase)
-                
-                
 
         layer.commitChanges()
         layer.removeSelection()
@@ -1190,44 +1159,26 @@ class PCAPostExcavation:
         self.dockwidget.entity_name_comboBox_2.clear() 
         self.dockwidget.phase_comboBox_2.clear()
         self.dockwidget.phase_comboBox_2.addItems([''])
-        
-        
-        
+
         ##configure
         self.period_list()
         self.group_names_list()
         self.entity_names_list()
-        
-        # self.dockwidget.period_comboBox_2.currentTextChanged.connect(self.subperiod_list_changed)
-        # self.dockwidget.period_comboBox_2.currentTextChanged.connect(self.change_period_number)
-        # self.dockwidget.sub_period_comboBox_2.currentTextChanged.connect(self.change_subperiod_number)
-        # self.dockwidget.group_name_comboBox_2.currentTextChanged.connect(self.change_group_number)
-        # self.dockwidget.entity_name_comboBox_2.currentTextChanged.connect(self.change_entity_number)
+
         return self.cleancomboBoxColour()
     
     def choose_style(self):
-        self.dlgtool6.full_periods_radioButton.setAutoExclusive(True)
-        self.dlgtool6.filtered_periods_radioButton.setAutoExclusive(True)
-        self.dlgtool6.combined_phases_radioButton.setAutoExclusive(True)
-        self.dlgtool6.groups_radioButton.setAutoExclusive(True)
-        
+        self.dlgtool6.raise_()
+
         self.dlgtool6.show()
         # Run the dialog event loop
-        result = self.dlgtool6.exec_()
+        #result = self.dlgtool6.exec_()
         # See if OK was pressed
-        if result:
-            pass
-            if self.dlgtool6.full_periods_radioButton.isChecked() == True:
-                return self.reapply_period_style()
-            
-            if self.dlgtool6.filtered_periods_radioButton.isChecked() == True:
-                return self.clean_empty_rules()
-            
-            if self.dlgtool6.combined_phases_radioButton.isChecked() == True:
-                return self.combined_periods_phases_style()
-            
-            if self.dlgtool6.groups_radioButton.isChecked() == True:
-                return self.apply_groups_style()
+        #if result:
+        self.dlgtool6.full_periods_pushButton.clicked.connect(self.reapply_period_style)
+        self.dlgtool6.filtered_periods_pushButton.clicked.connect(self.clean_empty_rules)
+        self.dlgtool6.combined_periods_phases_pushButton.clicked.connect(self.combined_periods_phases_style)
+        self.dlgtool6.groups_pushButton.clicked.connect(self.apply_groups_style)   
          
     def apply_groups_style(self):
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
@@ -1241,8 +1192,8 @@ class PCAPostExcavation:
             myLayerNode = root.findLayer(restyle_layer.id())
             myLayerNode.setExpanded(True)
             
-            self.dlgtool6.groups_radioButton.setAutoExclusive(False)
-            self.dlgtool6.groups_radioButton.setChecked(False)
+            # self.dlgtool6.groups_radioButton.setAutoExclusive(False)
+            # self.dlgtool6.groups_radioButton.setChecked(False)
             
             restyle_layer.triggerRepaint()
             restyle_layer.emitStyleChanged()            
@@ -1260,14 +1211,13 @@ class PCAPostExcavation:
             myLayerNode = root.findLayer(restyle_layer.id())
             myLayerNode.setExpanded(True)
             
-            self.dlgtool6.full_periods_radioButton.setAutoExclusive(False)
-            self.dlgtool6.full_periods_radioButton.setChecked(False)
+            # self.dlgtool6.full_periods_radioButton.setAutoExclusive(False)
+            # self.dlgtool6.full_periods_radioButton.setChecked(False)
             
             restyle_layer.triggerRepaint()
             restyle_layer.emitStyleChanged()            
             iface.mapCanvas().refresh()
             
-
     def clean_empty_rules(self):
     
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
@@ -1296,9 +1246,6 @@ class PCAPostExcavation:
             iface.layerTreeView().refreshLayerSymbology( restyle_layer.id() )
             restyle_layer.emitStyleChanged()
             iface.mapCanvas().refresh()
-            
-            self.dlgtool6.filtered_periods_radioButton.setAutoExclusive(False)
-            self.dlgtool6.filtered_periods_radioButton.setChecked(False)
 
     def combined_periods_phases_style(self):
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
@@ -1338,8 +1285,6 @@ class PCAPostExcavation:
             for u in phasing_set:
                 phasing_list.append(u)
             
-            
-
             for c in sorted(phasing_list):
                 print(c)
                 phasing_classes[c]= ("#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]), c)
@@ -1394,27 +1339,25 @@ class PCAPostExcavation:
             myLayerNode = root.findLayer(layer.id())
             myLayerNode.setExpanded(True)
 
-
-            self.dlgtool6.combined_phases_radioButton.setAutoExclusive(False)
-            self.dlgtool6.combined_phases_radioButton.setChecked(False)
-            
+    def choose_DRS_update_step(self):
+        self.dlgtool7.show()
+        # if self.first_start == True:
+           # self.first_start = False
+        self.dlgtool7.update_intervention_pushButton.clicked.connect(self.update_intervention_from_features)
+        self.dlgtool7.update_DRS_pushButton.clicked.connect(self.from_intervention_to_DRS)
+            # show the dialog
+        
+       
     def update_intervention_from_features(self):
-
         # if self.first_start == True:
             # self.first_start = False
-            
-            
-            
+
         # show the dialog
         self.dlgtool2.show()
         # Run the dialog event loop
         result = self.dlgtool2.exec_()
         # See if OK was pressed
-        if result:
-            
-            
-            #add the action here
-            
+        if result:            
             if len(QgsProject.instance().mapLayersByName('Interventions')) == 0:
                 QMessageBox.about(
                 None,
@@ -1423,8 +1366,7 @@ class PCAPostExcavation:
                 return self.dontdonothing()
                 
             if len(QgsProject.instance().mapLayersByName('Interventions')) != 0:
-            
-            
+
                 intervention_DRS_layer = QgsProject.instance().mapLayersByName("Interventions")[0]
             
                 #Create progress bar
@@ -1437,7 +1379,6 @@ class PCAPostExcavation:
                 
                 progress.setValue(0)
   
-                
                 #check if the group exists and, if not, create it
                 caps = intervention_DRS_layer.dataProvider().capabilities()    
                 resadd = intervention_DRS_layer.dataProvider()
@@ -1506,7 +1447,8 @@ class PCAPostExcavation:
                     progress.setValue(time_value)
                     
                 intervention_DRS_layer.commitChanges()
-                    
+                
+                self.dlgtool2.hide()                
                 iface.messageBar().clearWidgets()
                 QMessageBox.about(None,'PCA PostExcavation Plugin', 'The Intervention layer has been successfully updated.') 
 
@@ -1516,11 +1458,7 @@ class PCAPostExcavation:
         # Run the dialog event loop
         result = self.dlgtool5.exec_()
         # See if OK was pressed
-        if result:
-            
-            
-            #add the action here
-            
+        if result:            
             if len(QgsProject.instance().mapLayersByName('Interventions')) == 0:
                 QMessageBox.about(
                 None,
@@ -1585,7 +1523,7 @@ class PCAPostExcavation:
                     
                     progress.setValue(time_value)
                 
-                
+                self.dlgtool5.hide()
                 iface.messageBar().clearWidgets()
                 QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS has been successfully updated.')
          
@@ -1596,7 +1534,6 @@ class PCAPostExcavation:
         result = self.dlgtool4.exec_()
         # See if OK was pressed
         if result:
-            
             table_to_export = self.dlgtool4.Tables_on_GIS_comboBox.currentLayer() 
             sitecode =  self.dlgtool4.sitecode_textbox.text()
             filename =  table_to_export.name()
@@ -1854,3 +1791,8 @@ class PCAPostExcavation:
                 
     def dontdonothing(self):
         pass
+
+
+
+
+    
