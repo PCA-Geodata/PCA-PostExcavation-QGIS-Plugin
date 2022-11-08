@@ -1572,15 +1572,15 @@ class PCAPostExcavation:
         # See if OK was pressed
         if result:
             table_to_export = self.dlgtool4.Tables_on_GIS_comboBox.currentLayer() 
-            sitecode =  self.dlgtool4.sitecode_textbox.text()
-            filename =  table_to_export.name()
-            now = datetime.now().strftime("%Y%m%d_%H%M%S")
-            if len(table_to_export) == 0:
+            
+            if table_to_export is None:
                 QMessageBox.about(None,'PCA PostExcavation Plugin', 'No valid DRS table was selected. Please select a layer.')
                 return self.dontdonothing()
              
             else:
-                
+                sitecode =  self.dlgtool4.sitecode_textbox.text()
+                filename =  table_to_export.name()
+                now = datetime.now().strftime("%Y%m%d_%H%M%S")
                     
                 # Directory
                 CSV_export_directory = "Exported_CSV"
