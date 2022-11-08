@@ -459,20 +459,34 @@ class PCAPostExcavation:
             for a in used_group_list:
                 if a.find(ch_group_name) == 0:
                     filtered_list.append(a)
+
+            list_of_numbers=[]
+            for stri in filtered_list:
+                list_of_numbers.append([int(s) for s in stri.split() if s.isdigit()])
+
+            if len(list_of_numbers) != 0:
+                max_value = max(list_of_numbers)
+                for max_va in max_value:
+                    next_value = max_va+1
+                    proposed_group_number_list.append(str(next_value))        
+                    
+            if len(list_of_numbers) == 0:
+                next_value = '1'
+                proposed_group_number_list.append(next_value)
             
-            #if vlayer.selectedFeatureCount() != 0:
-            if current_value and current_value[0] in used_group_list and ch_group_name == "".join(re.sub('\d+', '', current_value[0]).rstrip().lstrip()):
-                proposed_group_number_list.append("".join(re.findall('\d+', current_value[0])))
-            
-            else:
-                new_group_number = str((len(filtered_list)+1))
-                proposed_group_number_list.append(new_group_number)
+            # #if vlayer.selectedFeatureCount() != 0:
+            # if current_value and current_value[0] in used_group_list and ch_group_name == "".join(re.sub('\d+', '', current_value[0]).rstrip().lstrip()):
+                # proposed_group_number_list.append("".join(re.findall('\d+', current_value[0])))
             
             
+            # else:
+                # new_group_number = str((len(filtered_list)+1))
+                # proposed_group_number_list.append(new_group_number)
+
             self.dockwidget.group_number_comboBox_2.clear()
             self.dockwidget.group_number_comboBox_2.addItems(proposed_group_number_list)  
             
-            
+            list_of_numbers.clear()
             used_group_list.clear()
             filtered_list.clear()
             current_value.clear()
@@ -502,16 +516,34 @@ class PCAPostExcavation:
                 if a.find(ch_entity_name) == 0:
                     entity_filtered_list.append(a)
                     
-            #if vlayer.selectedFeatureCount() != 0:
-            if entity_current_value and entity_current_value[0] in used_entity_list and ch_entity_name == "".join(re.sub('\d+', '', entity_current_value[0]).rstrip().lstrip()):
-                proposed_entity_number_list.append("".join(re.findall('\d+', entity_current_value[0])))        
+            list_of_numbers=[]
+            for stri in entity_filtered_list:
+                list_of_numbers.append([int(s) for s in stri.split() if s.isdigit()])
+                
+            if len(list_of_numbers) != 0:
+                max_value = max(list_of_numbers)
+                for max_va in max_value:
+                    next_value = max_va+1
+                    print ('next_value: ',next_value)
+                    proposed_entity_number_list.append(str(next_value))
+                
+   
+            if len(list_of_numbers) == 0:
+                next_value = '1'
+                proposed_entity_number_list.append(next_value)        
+                    
+                    
+            # #if vlayer.selectedFeatureCount() != 0:
+            # if entity_current_value and entity_current_value[0] in used_entity_list and ch_entity_name == "".join(re.sub('\d+', '', entity_current_value[0]).rstrip().lstrip()):
+                # proposed_entity_number_list.append("".join(re.findall('\d+', entity_current_value[0])))        
             
-            else:
-                new_entity_number = str((len(entity_filtered_list)+1))
-                proposed_entity_number_list.append(new_entity_number)
+            # else:
+                # new_entity_number = str((len(entity_filtered_list)+1))
+                # proposed_entity_number_list.append(new_entity_number)
             
             self.dockwidget.entity_number_comboBox_2.clear()
-            self.dockwidget.entity_number_comboBox_2.addItems(proposed_entity_number_list)  
+            self.dockwidget.entity_number_comboBox_2.addItems(proposed_entity_number_list) 
+            
             used_entity_list.clear()
             entity_filtered_list.clear()
             entity_current_value.clear()
@@ -978,6 +1010,9 @@ class PCAPostExcavation:
             existent_group_name = "".join(re.sub('\d+', '', group_values[0]).rstrip().lstrip())
             existent_group_number = "".join(re.findall('\d+', group_values[0]))
 
+            if existent_group_name == '_EMPTY VALUES':
+                existent_group_name = ''
+                
             self.dockwidget.group_name_comboBox_2.setCurrentText(existent_group_name)
             self.dockwidget.group_number_comboBox_2.setCurrentText(existent_group_number)
             self.dockwidget.group_number_comboBox_2.setStyleSheet("QComboBox"
@@ -1020,6 +1055,9 @@ class PCAPostExcavation:
         if len(entity_values) == 1:         
             existent_entity_name = "".join(re.sub('\d+', '', entity_values[0]).rstrip().lstrip())
             existent_entity_number = "".join(re.findall('\d+', entity_values[0]))
+
+            if existent_entity_name == '_EMPTY VALUES':
+                existent_entity_name = ''
 
             self.dockwidget.entity_name_comboBox_2.setCurrentText(existent_entity_name)
             self.dockwidget.entity_number_comboBox_2.setCurrentText(existent_entity_number)
@@ -1347,7 +1385,6 @@ class PCAPostExcavation:
         self.dlgtool7.update_DRS_pushButton.clicked.connect(self.from_intervention_to_DRS)
             # show the dialog
         
-       
     def update_intervention_from_features(self):
         # if self.first_start == True:
             # self.first_start = False
