@@ -320,7 +320,7 @@ class PCAPostExcavation:
     def group_names_list(self):
         #group_names_list = ['','Ditch', 'Mound', 'Roundhouse','SFB','Structure','Kiln','Corn Dryer','Pond','Well','Waterhole','Bedding Trench','Furrow','Pit Cluster','Pit Alignment','Pit Group','Surface','Fence Line','Inhumation Burial','Cremation Burial','Oven','Deposit']
         
-        group_names_list = ['','Ditch', 'Pit Group', 'Animal Burial', 'Cistern', 'Corn Dryer', 'Cremation Burial', 'Deposit', 'Drain', 'Fence Line', 'Flue', 'Foundation', 'Foundation Trench', 'Furnace', 'Furrow', 'Grave', 'Gully', 'Hearth', 'Inhumation Burial', 'Kiln', 'Mound', 'Midden', 'Natural', 'Oven', 'Pit Alignment', 'Pit Cluster', 'Pond', 'Post Hole', 'Post Packing', 'Post Pad', 'Post Pipe', 'Pyre', 'Quarry', 'Roundhouse', 'SFB', 'Skeleton', 'Stake Hole', 'Structure', 'Surface', 'Surface (external)', 'Surface (internal)', 'Wall', 'Water Hole', 'Well']
+        group_names_list = ['','Ditch', 'Pit Group', 'Animal Burial', 'Cistern', 'Corn Dryer', 'Cremation Burial', 'Deposit', 'Drain', 'Fence Line', 'Flue', 'Foundation', 'Foundation Trench', 'Furnace', 'Furrow', 'Grave', 'Gully', 'Hearth', 'Inhumation Burial', 'Kiln', 'Mound', 'Midden', 'Natural', 'Natural Channels','Oven', 'Pit Alignment', 'Pit Cluster', 'Pond', 'Post Hole', 'Post Packing', 'Post Pad', 'Post Pipe', 'Pyre', 'Quarry', 'Roundhouse', 'SFB', 'Skeleton', 'Stake Hole', 'Structure', 'Surface', 'Surface (external)', 'Surface (internal)', 'Wall', 'Water Hole', 'Well', 'Ungrouped']
 
         
         self.dockwidget.group_name_comboBox_2.clear()
@@ -328,14 +328,14 @@ class PCAPostExcavation:
         
     def entity_names_list(self):
         # entity_names_list = ['','Cemetery','Field System','Enclosure', 'Linear Boundary','Road/Trackway','Monument', 'Palaeochannel' ]
-        entity_names_list = ['', 'Aisled Barn', 'Boundary', 'Cemetery', 'Cultivation Channels', 'Field System', 'Enclosure', 'Monument', 'Occupation build-up', 'Road/Trackway', 'Palaeochannel' ]
+        entity_names_list = ['', 'Aisled Barn', 'Boundary', 'Cemetery', 'Cultivation Channels', 'Field System', 'Enclosure', 'Monument', 'Occupation build-up', 'Road/Trackway','Roundhouse', 'Palaeochannel' ]
 
         
         self.dockwidget.entity_name_comboBox_2.clear()
         self.dockwidget.entity_name_comboBox_2.addItems(entity_names_list)
         
     def period_list(self):
-        period_list = ['','Neolithic', 'Bronze Age', 'Iron Age', 'Romano-British', 'Anglo-Saxon', 'Medieval', 'Post Medieval', 'Modern']
+        period_list = ['','Neolithic', 'Bronze Age', 'Iron Age', 'Romano-British', 'Anglo-Saxon', 'Medieval', 'Post Medieval', 'Modern', 'Undated']
 
         self.dockwidget.period_comboBox_2.clear()
         self.dockwidget.period_comboBox_2.addItems(period_list)
@@ -358,6 +358,9 @@ class PCAPostExcavation:
         sub_postmedieval_list = ['', 'Early Post Medieval', 'Middle Post Medieval', 'Late Post Medieval']
         global sub_modern_list
         sub_modern_list = ['']
+        global undated_list
+        undated_list = ['']
+        
 
         if ch_period == 'Neolithic':
             self.dockwidget.sub_period_comboBox_2.clear()
@@ -390,6 +393,10 @@ class PCAPostExcavation:
         if ch_period == 'Modern':
             self.dockwidget.sub_period_comboBox_2.clear()
             self.dockwidget.sub_period_comboBox_2.addItems(sub_modern_list)
+            
+        if ch_period == 'Undated':
+            self.dockwidget.sub_period_comboBox_2.clear()
+            self.dockwidget.sub_period_comboBox_2.addItems(undated_list)
                    
     def change_period_number(self):
         ch_period = self.dockwidget.period_comboBox_2.currentText()
@@ -400,8 +407,12 @@ class PCAPostExcavation:
             return self.dontdonothing
         else:
             
-            period_list = ['Neolithic', 'Bronze Age', 'Iron Age', 'Romano-British', 'Anglo-Saxon', 'Medieval', 'Post Medieval', 'Modern']
-            ch_period_number = str(period_list.index(ch_period)+1)
+            period_list = ['Neolithic', 'Bronze Age', 'Iron Age', 'Romano-British', 'Anglo-Saxon', 'Medieval', 'Post Medieval', 'Modern', 'Undated']
+            
+            if ch_period == 'Undated':
+                ch_period_number = ''
+            else:
+                ch_period_number = str(period_list.index(ch_period)+1)
 
             ch_period_number_list = []
             ch_period_number_list.append(ch_period_number)
@@ -415,6 +426,7 @@ class PCAPostExcavation:
         
         if ch_subperiod == 0:
             return self.dontdonothing
+        
         else:
 
             AllItems = [self.dockwidget.sub_period_comboBox_2.itemText(i) for i in range(self.dockwidget.sub_period_comboBox_2.count())]
@@ -441,7 +453,11 @@ class PCAPostExcavation:
         vlayer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
         if ch_group_name == '':
             self.dockwidget.group_number_comboBox_2.clear()
-        if ch_group_name != '':
+        
+        if ch_group_name == 'Ungrouped':
+            self.dockwidget.group_number_comboBox_2.clear()
+        
+        else:
             
             current_value = []
             proposed_group_number_list = []
@@ -1096,10 +1112,16 @@ class PCAPostExcavation:
                                                                  "}")
             multiple_periods = ', ' .join(str(e) for e in sorted(period_values))
             self.dockwidget.multiperiod_label.setText(multiple_periods)
+
         
+        if len(period_values) == 1:
+            existent_period_value = (period_values[0])
+
+            if existent_period_value  == '_EMPTY VALUES':
+                existent_period_value = ''
         
-        if len(period_values) == 1:         
-            self.dockwidget.period_comboBox_2.setCurrentText(period_values[0])
+            self.dockwidget.period_comboBox_2.setCurrentText(existent_period_value)        
+            #self.dockwidget.period_comboBox_2.setCurrentText(period_values[0])
             self.dockwidget.period_comboBox_2.setStyleSheet("QComboBox"
                                                                  "{"
                                                                  ""
@@ -1109,7 +1131,7 @@ class PCAPostExcavation:
                                                                  ""
                                                                  "}")
             self.dockwidget.multiperiod_label.setText('')
-                                                                 
+
         #subperiod
         subperiod_values = []
         for feat in layer.selectedFeatures():
@@ -1136,8 +1158,14 @@ class PCAPostExcavation:
             multiple_subperiods = ', ' .join(str(e) for e in sorted(subperiod_values))
             self.dockwidget.multisubperiod_label.setText(multiple_subperiods)
             
-        if len(subperiod_values) == 1:         
-            self.dockwidget.sub_period_comboBox_2.setCurrentText(subperiod_values[0])
+        if len(subperiod_values) == 1:
+
+            existent_subperiod_value = (subperiod_values[0])
+
+            if existent_subperiod_value  == '_EMPTY VALUES':
+                existent_subperiod_value = ''      
+                
+            self.dockwidget.sub_period_comboBox_2.setCurrentText(existent_subperiod_value)
             self.dockwidget.sub_period_comboBox_2.setStyleSheet("QComboBox"
                                                                  "{"
                                                                  ""
@@ -1504,65 +1532,97 @@ class PCAPostExcavation:
                 return self.dontdonothing()
                 
             if len(QgsProject.instance().mapLayersByName('Interventions')) != 0:
-
-                #Create progress bar
-                progressMessageBar = iface.messageBar().createMessage("DRS is being updated...")
-                progress = QProgressBar()
-                progress.setMaximum(100)
-                progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
-                progressMessageBar.layout().addWidget(progress)
-                iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
-                
-                
-                
-                progress.setValue(0)
-                
-                group_field_name_list = ["Group","Entity", "Period", "Period Number", "Sub Period","Sub Period Number","Phase"]
-                intervention = QgsProject.instance().mapLayersByName('Interventions')[0]
-                DRS_to_update = QgsProject.instance().mapLayersByName('DRS_Table')[0]
-
-
-                caps = DRS_to_update.dataProvider().capabilities()    
-                resadd = DRS_to_update.dataProvider()
-
-         
-
-                for group_name in group_field_name_list:
-                    group_field_name = group_name
-                    field_index = DRS_to_update.fields().indexFromName(group_name)
-                    if field_index == -1:
-                        resadd.addAttributes([QgsField(group_name, QVariant.String, '', 254)])
-
-                DRS_to_update.updateFields()  
-                
-                progress.setValue(10)
-                time_value = 10
-                for group_name in group_field_name_list:
+                if len(QgsProject.instance().mapLayersByName('DRS_Table')) != 0:
+                    DRS_to_update = QgsProject.instance().mapLayersByName('DRS_Table')[0]
                     
+                    
+                  
+
+                    context_list = []
                     for f in DRS_to_update.getFeatures():
-                        cut = f["Cut"]
-                        id = f.id()
+                        context_list.append(f['Context'])
                         
-                        any_group_field_idx = DRS_to_update.fields().indexOf(group_name)
+                    if NULL in context_list:
+                        QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS table contains one or more NULL values in the Context field. Please fix them and retry.')
+                        return self.dontdonothing()
+                    if NULL not in context_list:
+                        cut_list = []
+                        for f in DRS_to_update.getFeatures():
+                            cut_list.append(f['Cut'])
                         
-                        exp = QgsExpression('context_no = '+cut)
-                        request = QgsFeatureRequest(exp)
+                        if NULL in cut_list:
+                            QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS table contains one or more NULL values in the Cut field. Please fix them and retry.')
+                            return self.dontdonothing()
                         
-                        for fea in intervention.getFeatures(request):
-                            group = fea[group_name]
+                        if NULL not in cut_list:
 
-                        DRS_to_update.startEditing()
-                        DRS_to_update.selectByExpression("$id ="+ str(id))
-                        for feat_id in DRS_to_update.selectedFeatureIds():
-                            DRS_to_update.changeAttributeValue(feat_id, any_group_field_idx, group)
-                    DRS_to_update.commitChanges()
-                    time_value += 10
-                    
-                    progress.setValue(time_value)
-                
-                self.dlgtool5.hide()
-                iface.messageBar().clearWidgets()
-                QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS has been successfully updated.')
+                            #Create progress bar
+                            progressMessageBar = iface.messageBar().createMessage("DRS is being updated...")
+                            progress = QProgressBar()
+                            progress.setMaximum(100)
+                            progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+                            progressMessageBar.layout().addWidget(progress)
+                            iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
+                            
+                            
+                            
+                            progress.setValue(0)
+                            
+                            group_field_name_list = ["Group","Entity", "Period", "Period Number", "Sub Period","Sub Period Number","Phase"]
+                            intervention = QgsProject.instance().mapLayersByName('Interventions')[0]
+                            
+
+
+                            caps = DRS_to_update.dataProvider().capabilities()    
+                            resadd = DRS_to_update.dataProvider()
+
+                     
+
+                            for group_name in group_field_name_list:
+                                group_field_name = group_name
+                                field_index = DRS_to_update.fields().indexFromName(group_name)
+                                if field_index == -1:
+                                    resadd.addAttributes([QgsField(group_name, QVariant.String, '', 254)])
+
+                            DRS_to_update.updateFields()  
+                            
+                            progress.setValue(10)
+                            time_value = 10
+                            
+                            interv_cut_list = []
+                            for f_cut in intervention.getFeatures():
+                                interv_cut_list.append(str(f_cut['Context_no']))
+                            
+                            for group_name in group_field_name_list:
+                                DRS_to_update.startEditing()
+                                
+                                for f in DRS_to_update.getFeatures():
+                                    cut = f["Cut"]
+                                    f_id = f.id()
+                                    
+                                    if cut not in interv_cut_list:
+                                        pass
+                                    if cut  in interv_cut_list:
+                                        
+                                        any_group_field_idx = DRS_to_update.fields().indexOf(group_name)
+                                        
+                                        exp = QgsExpression('context_no = '+cut)
+                                        request = QgsFeatureRequest(exp)
+                                        
+                                        for fea in intervention.getFeatures(request):
+                                            new_value_from_int = fea[group_name]
+
+                                        DRS_to_update.selectByExpression("$id ="+ str(f_id))
+                                        for feat_id in DRS_to_update.selectedFeatureIds():
+                                            DRS_to_update.changeAttributeValue(feat_id, any_group_field_idx, new_value_from_int)
+                                DRS_to_update.commitChanges()
+                                time_value += 10
+                                
+                                progress.setValue(time_value)
+                            
+                            self.dlgtool5.hide()
+                            iface.messageBar().clearWidgets()
+                            QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS has been successfully updated.')
          
     def export_table_for_access(self):
             # show the dialog
