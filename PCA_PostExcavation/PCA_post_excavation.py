@@ -1523,7 +1523,11 @@ class PCAPostExcavation:
         # Run the dialog event loop
         result = self.dlgtool5.exec_()
         # See if OK was pressed
-        if result:            
+        if result:
+
+            ##starting calculating processing time
+            time0= datetime.now()
+        
             if len(QgsProject.instance().mapLayersByName('Interventions')) == 0:
                 QMessageBox.about(
                 None,
@@ -1535,9 +1539,6 @@ class PCAPostExcavation:
                 if len(QgsProject.instance().mapLayersByName('DRS_Table')) != 0:
                     DRS_to_update = QgsProject.instance().mapLayersByName('DRS_Table')[0]
                     
-                    
-                  
-
                     context_list = []
                     for f in DRS_to_update.getFeatures():
                         context_list.append(f['Context'])
@@ -1571,12 +1572,21 @@ class PCAPostExcavation:
                             group_field_name_list = ["Group","Entity", "Period", "Period Number", "Sub Period","Sub Period Number","Phase"]
                             intervention = QgsProject.instance().mapLayersByName('Interventions')[0]
                             
-
-
+                            #build adn populate Intervention Dict    
+                            dict = {}
+                            for f in intervention.getFeatures():
+                                key = f['context_no']
+                                dict.setdefault(key, []).append(f['Group'])
+                                dict.setdefault(key, []).append(f['Entity'])
+                                dict.setdefault(key, []).append(f['Period'])
+                                dict.setdefault(key, []).append(f['Period Number'])
+                                dict.setdefault(key, []).append(f['Sub Period'])
+                                dict.setdefault(key, []).append(f['Sub Period Number'])
+                                dict.setdefault(key, []).append(f['Phase'])
+                                
+                            #check if DRS has groups or add them
                             caps = DRS_to_update.dataProvider().capabilities()    
-                            resadd = DRS_to_update.dataProvider()
-
-                     
+                            resadd = DRS_to_update.dataProvider()                   
 
                             for group_name in group_field_name_list:
                                 group_field_name = group_name
@@ -1593,37 +1603,43 @@ class PCAPostExcavation:
                             for f_cut in intervention.getFeatures():
                                 interv_cut_list.append(str(f_cut['Context_no']))
                             
-                            for group_name in group_field_name_list:
-                                DRS_to_update.startEditing()
-                                
-                                for f in DRS_to_update.getFeatures():
-                                    cut = f["Cut"]
-                                    f_id = f.id()
+                            DRS_to_update.startEditing()
+                                                       
+                            increment = DRS_to_update.featureCount()/90
+                            for f in DRS_to_update.getFeatures():
+                                cut = f["Cut"]
+                                f_id = f.id()
+                                #iface.mainWindow().statusBar().showMessage(cut)
+                                #print (cut)
+                                if cut not in interv_cut_list:
+                                    pass
+                                if cut  in interv_cut_list:
+                                    DRS_to_update.selectByExpression("$id ="+ str(f_id))
                                     
-                                    if cut not in interv_cut_list:
-                                        pass
-                                    if cut  in interv_cut_list:
-                                        
+                                                                        
+                                    for group_name in group_field_name_list:
+                                        group_index = group_field_name_list.index(group_name)
                                         any_group_field_idx = DRS_to_update.fields().indexOf(group_name)
-                                        
-                                        exp = QgsExpression('context_no = '+cut)
-                                        request = QgsFeatureRequest(exp)
-                                        
-                                        for fea in intervention.getFeatures(request):
-                                            new_value_from_int = fea[group_name]
-
-                                        DRS_to_update.selectByExpression("$id ="+ str(f_id))
                                         for feat_id in DRS_to_update.selectedFeatureIds():
-                                            DRS_to_update.changeAttributeValue(feat_id, any_group_field_idx, new_value_from_int)
-                                DRS_to_update.commitChanges()
-                                time_value += 10
-                                
-                                progress.setValue(time_value)
-                            
+                                            DRS_to_update.changeAttributeValue(feat_id, any_group_field_idx, dict[int(cut)][group_index])
+                                            
+                                            time_value += increment
+                                            progress.setValue(time_value)
+
+                            DRS_to_update.commitChanges()
+ 
                             self.dlgtool5.hide()
                             iface.messageBar().clearWidgets()
+                            ##ending time
+                            time1= datetime.now()
+                            ##duration
+                            delta = time1-time0
+
+                            time = delta.total_seconds()
+                            print ('Time is {} seconds'.format(time))
+                            
                             QMessageBox.about(None,'PCA PostExcavation Plugin', 'The DRS has been successfully updated.')
-         
+                                 
     def export_table_for_access(self):
             # show the dialog
         self.dlgtool4.show()
