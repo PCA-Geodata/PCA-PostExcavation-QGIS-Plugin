@@ -39,7 +39,7 @@ from qgis.utils import iface
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QFont
 
 
 
@@ -1244,7 +1244,9 @@ class PCAPostExcavation:
         self.dlgtool6.full_periods_pushButton.clicked.connect(self.reapply_period_style)
         self.dlgtool6.filtered_periods_pushButton.clicked.connect(self.clean_empty_rules)
         self.dlgtool6.combined_periods_phases_pushButton.clicked.connect(self.combined_periods_phases_style)
-        self.dlgtool6.groups_pushButton.clicked.connect(self.apply_groups_style)   
+        self.dlgtool6.groups_pushButton.clicked.connect(self.apply_groups_style)
+        self.dlgtool6.entities_pushButton.clicked.connect(self.apply_entity_style)
+        
          
     def apply_groups_style(self):
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
@@ -1318,6 +1320,8 @@ class PCAPostExcavation:
             return self.dontdonothing
         else: 
             layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
+            
+            #Symbology
             phasing_set = set()
             phasing_list = []
             phasing_classes = {}
@@ -1352,7 +1356,6 @@ class PCAPostExcavation:
                 phasing_list.append(u)
             
             for c in sorted(phasing_list):
-                print(c)
                 phasing_classes[c]= ("#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]), c)
                 
             phasing_classes['']= ('#cccccc', 'Empty values')
@@ -1382,15 +1385,77 @@ class PCAPostExcavation:
             ,
             if (Phase is not Null, 
              ' / ' ||
-            "Phase", ''
-            )
-            )
-
+            "Phase", ''))
             '''
             # Set the categorized renderer
             renderer = QgsCategorizedSymbolRenderer(expression, categories)
 
+            layer.setRenderer(renderer)
 
+            root = QgsProject.instance().layerTreeRoot()
+            myLayerNode = root.findLayer(layer.id())
+            myLayerNode.setExpanded(True)
+
+            #Labels           
+            layer_settings  = QgsPalLayerSettings()
+            layer_settings.fieldName = ''
+            layer_settings.enabled = False
+
+            layer_settings = QgsVectorLayerSimpleLabeling(layer_settings)
+            layer.setLabelsEnabled(False)
+            layer.setLabeling(layer_settings)
+            
+            # Refresh layer
+            layer.triggerRepaint()
+            iface.layerTreeView().refreshLayerSymbology( layer.id() )
+            layer.emitStyleChanged()
+            iface.mapCanvas().refresh()          
+
+    def natural_sort(self, l): 
+            convert = lambda text: int(text) if text.isdigit() else text.lower()
+            alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+            return sorted(l, key=alphanum_key)
+
+    def apply_entity_style(self):
+        if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
+            return self.dontdonothing
+        else: 
+            layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
+
+            #Symbology
+            entities_list = []
+            entities_classes = {}
+
+            for e in layer.getFeatures():
+                entity = e['Entity']   
+                
+                if entity != NULL:
+                    if entity not in entities_list:
+                        entities_list.append(entity)
+            sorted_entities_list = self.natural_sort(entities_list)
+
+            for c in sorted_entities_list:
+                entities_classes[c]= ("#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]), c)
+                
+            entities_classes['']= ('#cccccc', 'Empty values')
+
+            categories = []
+            # Iterate through the dictionary
+            for classes, (color, label) in entities_classes.items():
+                # Automatically set symbols based on layer's geometry
+                symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+                # Set colour
+                symbol.setColor(QColor(color))
+                # Set symbol with value = 0 to be transparent
+                symbol.setOpacity(0.65)
+                # Set the renderer properties
+                category = QgsRendererCategory(classes, symbol, label)
+                categories.append(category)
+
+            # Field name
+            expression = '"Entity"'
+            # Set the categorized renderer
+            renderer = QgsCategorizedSymbolRenderer(expression, categories)
 
             layer.setRenderer(renderer)
 
@@ -1399,11 +1464,38 @@ class PCAPostExcavation:
             iface.layerTreeView().refreshLayerSymbology( layer.id() )
             layer.emitStyleChanged()
             iface.mapCanvas().refresh()
-            
-            
+
+
             root = QgsProject.instance().layerTreeRoot()
             myLayerNode = root.findLayer(layer.id())
             myLayerNode.setExpanded(True)
+            
+            #Labels
+            
+            layer_settings  = QgsPalLayerSettings()
+            text_format = QgsTextFormat()
+
+            text_format.setFont(QFont("Arial", 8))
+            text_format.setSize(8)
+
+            buffer_settings = QgsTextBufferSettings()
+            buffer_settings.setEnabled(True)
+            buffer_settings.setSize(1)
+            buffer_settings.setColor(QColor("white"))
+            buffer_settings.setOpacity(0.6)
+
+            text_format.setBuffer(buffer_settings)
+            layer_settings.setFormat(text_format)
+
+            layer_settings.fieldName = "Entity"
+            layer_settings.placement = 2
+
+            layer_settings.enabled = True
+
+            layer_settings = QgsVectorLayerSimpleLabeling(layer_settings)
+            layer.setLabelsEnabled(True)
+            layer.setLabeling(layer_settings)
+            layer.triggerRepaint()
 
     def choose_DRS_update_step(self):
         self.dlgtool7.show()

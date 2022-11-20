@@ -6,7 +6,7 @@
 name=PCA Post Excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=2.06
+version=2.07
 author=Valerio Pinna (Pre-Construct Archaeology)
 email=vpinna@pre-construct.com
 
@@ -24,11 +24,16 @@ repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog= v 2.06: - update DRS through dictionary to speed the process
-		   v 2.05: - added Ungrouped to group list
-					 change group style
-					 added undated to periods
-					 added exeption for cut/context Null on DRS context table
+changelog= 2.07
+ - Added Entities style 
+ - Added line to turn off labels on combined phases style
+ <p>2.06
+ - Updating DRS through dictionary to speed up the process
+ <p>2.05
+ - Added 'Ungrouped' to group list
+ - Changed Groups style (new .qml)
+ - Added 'Undated' to periods
+ - Added exeption for cut/context Null on DRS context table
 
 
 
