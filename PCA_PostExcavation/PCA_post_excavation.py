@@ -143,7 +143,6 @@ class PCAPostExcavation:
         self.pluginIsActive = False
         self.dockwidget = None
 
-
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -158,7 +157,6 @@ class PCAPostExcavation:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('PCAPostExcavation', message)
-
 
     def add_action(
         self,
@@ -232,7 +230,6 @@ class PCAPostExcavation:
         self.actions.append(action)
 
         return action
-
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -318,11 +315,8 @@ class PCAPostExcavation:
         del self.toolbar
 
     def group_names_list(self):
-        #group_names_list = ['','Ditch', 'Mound', 'Roundhouse','SFB','Structure','Kiln','Corn Dryer','Pond','Well','Waterhole','Bedding Trench','Furrow','Pit Cluster','Pit Alignment','Pit Group','Surface','Fence Line','Inhumation Burial','Cremation Burial','Oven','Deposit']
-        
         group_names_list = ['','Ditch', 'Pit Group', 'Animal Burial', 'Cistern', 'Corn Dryer', 'Cremation Burial', 'Deposit', 'Drain', 'Fence Line', 'Flue', 'Foundation', 'Foundation Trench', 'Furnace', 'Furrow', 'Grave', 'Gully', 'Hearth', 'Inhumation Burial', 'Kiln', 'Mound', 'Midden', 'Natural', 'Natural Channels','Oven', 'Pit Alignment', 'Pit Cluster', 'Pond', 'Post Hole', 'Post Packing', 'Post Pad', 'Post Pipe', 'Pyre', 'Quarry', 'Roundhouse', 'SFB', 'Skeleton', 'Stake Hole', 'Structure', 'Surface', 'Surface (external)', 'Surface (internal)', 'Wall', 'Water Hole', 'Well', 'Ungrouped']
 
-        
         self.dockwidget.group_name_comboBox_2.clear()
         self.dockwidget.group_name_comboBox_2.addItems(group_names_list)
         
@@ -450,11 +444,19 @@ class PCAPostExcavation:
                         
     def change_group_number(self, ch_group_name):
 
+
+        print ('chage number ch_group_name', ch_group_name)
+        print ('chage number ch_group_name', len(ch_group_name))
         vlayer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
+        
+        
         if ch_group_name == '':
             self.dockwidget.group_number_comboBox_2.clear()
+            
+        elif len(ch_group_name) == 0:
+            self.dockwidget.group_number_comboBox_2.clear()
         
-        if ch_group_name == 'Ungrouped':
+        elif ch_group_name == 'Ungrouped':
             self.dockwidget.group_number_comboBox_2.clear()
         
         else:
@@ -500,6 +502,7 @@ class PCAPostExcavation:
                 # proposed_group_number_list.append(new_group_number)
 
             self.dockwidget.group_number_comboBox_2.clear()
+            print ('proposed_group_number_list', proposed_group_number_list)
             self.dockwidget.group_number_comboBox_2.addItems(proposed_group_number_list)  
             
             list_of_numbers.clear()
@@ -540,7 +543,6 @@ class PCAPostExcavation:
                 max_value = max(list_of_numbers)
                 for max_va in max_value:
                     next_value = max_va+1
-                    print ('next_value: ',next_value)
                     proposed_entity_number_list.append(str(next_value))
                 
    
@@ -832,6 +834,7 @@ class PCAPostExcavation:
                             return self.retrievevalues()
                         if layer.selectedFeatureCount() == 0:
                             self.dockwidget.apply_attribute_pushButton.setEnabled(False)
+                            return self.clean_attributes()
                     else:
                         self.dockwidget.setEnabled(False)
       
@@ -866,6 +869,7 @@ class PCAPostExcavation:
                             return self.retrievevalues()
                         if layer.selectedFeatureCount() == 0:
                             self.dockwidget.apply_attribute_pushButton.setEnabled(False)
+                            print ('zero selection')
                             return self.clean_attributes()
                    
     def cleancomboBoxColour(self):
@@ -993,227 +997,236 @@ class PCAPostExcavation:
         return self.clean_attributes()
 
     def retrievevalues(self):
-        layer = iface.activeLayer()
-        
-        #group
-        group_values = []
-        for feat in layer.selectedFeatures():
-            if layer.selectedFeatures() != 0:
-                group_value = feat['Group']
-                if group_value == NULL:
-                    if '_EMPTY VALUES' not in group_values:
-                        group_values.append('_EMPTY VALUES') 
-                if group_value != NULL:
-                    if group_value not in group_values:
-                        group_values.append(group_value)    
-
-        if len(group_values) > 1:
-            self.dockwidget.group_name_comboBox_2.setCurrentText('')
-            self.dockwidget.group_number_comboBox_2.setCurrentText('')
-            self.dockwidget.group_number_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            self.dockwidget.group_name_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            multiple_groups = ', ' .join(str(e) for e in sorted(group_values))
-            self.dockwidget.multigroup_label.setText(multiple_groups)
-            
-            
-        if len(group_values) == 1:         
-            existent_group_name = "".join(re.sub('\d+', '', group_values[0]).rstrip().lstrip())
-            existent_group_number = "".join(re.findall('\d+', group_values[0]))
-
-            if existent_group_name == '_EMPTY VALUES':
-                existent_group_name = ''
+        try:
+            layer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
+        except:
+            return self.dontdonothing()
                 
-            self.dockwidget.group_name_comboBox_2.setCurrentText(existent_group_name)
-            self.dockwidget.group_number_comboBox_2.setCurrentText(existent_group_number)
-            self.dockwidget.group_number_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.group_name_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.multigroup_label.setText('')
+        else:
             
-        #entity
-        entity_values = []
-        for feat in layer.selectedFeatures():
-            if layer.selectedFeatures() != 0:
-                entity_value = feat['Entity']
-                if entity_value == NULL:
-                    if '_EMPTY VALUES' not in entity_values:
-                        entity_values.append('_EMPTY VALUES') 
-                if entity_value != NULL:
-                    if entity_value not in entity_values:
-                        entity_values.append(entity_value)    
-
-        if len(entity_values) > 1:
-            self.dockwidget.entity_name_comboBox_2.setCurrentText('')
-            self.dockwidget.entity_number_comboBox_2.setCurrentText('')
-            self.dockwidget.entity_number_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            self.dockwidget.entity_name_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            
-            multiple_entities = ', ' .join(str(e) for e in sorted(entity_values))
-            self.dockwidget.multientity_label.setText(multiple_entities)
-            
-        if len(entity_values) == 1:         
-            existent_entity_name = "".join(re.sub('\d+', '', entity_values[0]).rstrip().lstrip())
-            existent_entity_number = "".join(re.findall('\d+', entity_values[0]))
-
-            if existent_entity_name == '_EMPTY VALUES':
-                existent_entity_name = ''
-
-            self.dockwidget.entity_name_comboBox_2.setCurrentText(existent_entity_name)
-            self.dockwidget.entity_number_comboBox_2.setCurrentText(existent_entity_number)
-            self.dockwidget.entity_number_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.entity_name_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.multientity_label.setText('')
-                                                                 
-        #period
-        period_values = []
-        for feat in layer.selectedFeatures():
-            if layer.selectedFeatures() != 0:
-                period_value = feat['Period']
-                if period_value == NULL:
-                    if '_EMPTY VALUES' not in period_values:
-                        period_values.append('_EMPTY VALUES')
-                if period_value != NULL:
-                    if period_value not in period_values:
-                        period_values.append(period_value)    
-
-        if len(period_values) > 1:
-            self.dockwidget.period_comboBox_2.setCurrentText('')
-            
-            self.dockwidget.period_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            self.dockwidget.period_number_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            multiple_periods = ', ' .join(str(e) for e in sorted(period_values))
-            self.dockwidget.multiperiod_label.setText(multiple_periods)
-
         
-        if len(period_values) == 1:
-            existent_period_value = (period_values[0])
+            #group
+            group_values = []
+            for feat in layer.selectedFeatures():
+                if layer.selectedFeatures() != 0:
+                    group_value = feat['Group']
+                    if group_value == NULL:
+                        if '_EMPTY VALUES' not in group_values:
+                            group_values.append('_EMPTY VALUES') 
+                    if group_value != NULL:
+                        if group_value not in group_values:
+                            group_values.append(group_value)    
 
-            if existent_period_value  == '_EMPTY VALUES':
-                existent_period_value = ''
-        
-            self.dockwidget.period_comboBox_2.setCurrentText(existent_period_value)        
-            #self.dockwidget.period_comboBox_2.setCurrentText(period_values[0])
-            self.dockwidget.period_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.period_number_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.multiperiod_label.setText('')
-
-        #subperiod
-        subperiod_values = []
-        for feat in layer.selectedFeatures():
-            if layer.selectedFeatures() != 0:
-                subperiod_value = feat['SubPeriod']
-                if subperiod_value == NULL:
-                    if '_EMPTY VALUES' not in subperiod_values:
-                        subperiod_values.append('_EMPTY VALUES')
-                if subperiod_value != NULL:
-                    if subperiod_value not in subperiod_values:
-                        subperiod_values.append(subperiod_value)    
-
-        if len(subperiod_values) > 1:
-            self.dockwidget.sub_period_comboBox_2.setCurrentText('')
-            
-            self.dockwidget.sub_period_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            self.dockwidget.subperiod_number_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            multiple_subperiods = ', ' .join(str(e) for e in sorted(subperiod_values))
-            self.dockwidget.multisubperiod_label.setText(multiple_subperiods)
-            
-        if len(subperiod_values) == 1:
-
-            existent_subperiod_value = (subperiod_values[0])
-
-            if existent_subperiod_value  == '_EMPTY VALUES':
-                existent_subperiod_value = ''      
+            if len(group_values) > 1:
+                self.dockwidget.group_name_comboBox_2.setCurrentText('')
+                self.dockwidget.group_number_comboBox_2.setCurrentText('')
+                self.dockwidget.group_number_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                self.dockwidget.group_name_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                multiple_groups = ', ' .join(str(e) for e in sorted(group_values))
+                self.dockwidget.multigroup_label.setText(multiple_groups)
                 
-            self.dockwidget.sub_period_comboBox_2.setCurrentText(existent_subperiod_value)
-            self.dockwidget.sub_period_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.subperiod_number_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.multisubperiod_label.setText('')
-        
-        #phase
-        phase_values = []
-        for feat in layer.selectedFeatures():
-            if layer.selectedFeatures() != 0:
-                phase_value = feat['Phase']
-                if phase_value == NULL:
-                    if '_EMPTY VALUES' not in phase_values:
-                        phase_values.append('_EMPTY VALUES')
-                if phase_value != NULL:
-                    if phase_value not in phase_values:
-                        phase_values.append(phase_value)    
+                
+            if len(group_values) == 1:         
+                existent_group_name = "".join(re.sub('\d+', '', group_values[0]).rstrip().lstrip())
+                existent_group_number = "".join(re.findall('\d+', group_values[0]))
+
+                if existent_group_name == '_EMPTY VALUES':
+                    existent_group_name = ''
+                    
+                self.dockwidget.group_name_comboBox_2.setCurrentText(existent_group_name)
+                self.dockwidget.group_number_comboBox_2.setCurrentText(existent_group_number)
+                self.dockwidget.group_number_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.group_name_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.multigroup_label.setText('')
+                
+            #entity
+            entity_values = []
+            for feat in layer.selectedFeatures():
+                if layer.selectedFeatures() != 0:
+                    entity_value = feat['Entity']
+                    if entity_value == NULL:
+                        if '_EMPTY VALUES' not in entity_values:
+                            entity_values.append('_EMPTY VALUES') 
+                    if entity_value != NULL:
+                        if entity_value not in entity_values:
+                            entity_values.append(entity_value)    
+
+            if len(entity_values) > 1:
+                self.dockwidget.entity_name_comboBox_2.setCurrentText('')
+                self.dockwidget.entity_number_comboBox_2.setCurrentText('')
+                self.dockwidget.entity_number_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                self.dockwidget.entity_name_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                
+                multiple_entities = ', ' .join(str(e) for e in sorted(entity_values))
+                self.dockwidget.multientity_label.setText(multiple_entities)
+                
+            if len(entity_values) == 1:         
+                existent_entity_name = "".join(re.sub('\d+', '', entity_values[0]).rstrip().lstrip())
+                existent_entity_number = "".join(re.findall('\d+', entity_values[0]))
+
+                if existent_entity_name == '_EMPTY VALUES':
+                    existent_entity_name = ''
+
+                self.dockwidget.entity_name_comboBox_2.setCurrentText(existent_entity_name)
+                self.dockwidget.entity_number_comboBox_2.setCurrentText(existent_entity_number)
+                self.dockwidget.entity_number_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.entity_name_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.multientity_label.setText('')
+                                                                     
+            #period
+            period_values = []
+            for feat in layer.selectedFeatures():
+                if layer.selectedFeatures() != 0:
+                    period_value = feat['Period']
+                    if period_value == NULL:
+                        if '_EMPTY VALUES' not in period_values:
+                            period_values.append('_EMPTY VALUES')
+                    if period_value != NULL:
+                        if period_value not in period_values:
+                            period_values.append(period_value)    
+
+            if len(period_values) > 1:
+                self.dockwidget.period_comboBox_2.setCurrentText('')
+                
+                self.dockwidget.period_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                self.dockwidget.period_number_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                multiple_periods = ', ' .join(str(e) for e in sorted(period_values))
+                self.dockwidget.multiperiod_label.setText(multiple_periods)
+
+            
+            if len(period_values) == 1:
+                existent_period_value = (period_values[0])
+
+                if existent_period_value  == '_EMPTY VALUES':
+                    existent_period_value = ''
+            
+                self.dockwidget.period_comboBox_2.setCurrentText(existent_period_value)        
+                #self.dockwidget.period_comboBox_2.setCurrentText(period_values[0])
+                self.dockwidget.period_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.period_number_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.multiperiod_label.setText('')
+
+            #subperiod
+            subperiod_values = []
+            for feat in layer.selectedFeatures():
+                if layer.selectedFeatures() != 0:
+                    subperiod_value = feat['SubPeriod']
+                    if subperiod_value == NULL:
+                        if '_EMPTY VALUES' not in subperiod_values:
+                            subperiod_values.append('_EMPTY VALUES')
+                    if subperiod_value != NULL:
+                        if subperiod_value not in subperiod_values:
+                            subperiod_values.append(subperiod_value)    
+
+            if len(subperiod_values) > 1:
+                self.dockwidget.sub_period_comboBox_2.setCurrentText('')
+                
+                self.dockwidget.sub_period_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                self.dockwidget.subperiod_number_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                multiple_subperiods = ', ' .join(str(e) for e in sorted(subperiod_values))
+                self.dockwidget.multisubperiod_label.setText(multiple_subperiods)
+                
+            if len(subperiod_values) == 1:
+
+                existent_subperiod_value = (subperiod_values[0])
+
+                if existent_subperiod_value  == '_EMPTY VALUES':
+                    existent_subperiod_value = ''      
+                    
+                self.dockwidget.sub_period_comboBox_2.setCurrentText(existent_subperiod_value)
+                self.dockwidget.sub_period_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.subperiod_number_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.multisubperiod_label.setText('')
+            
+            #phase
+            phase_values = []
+            for feat in layer.selectedFeatures():
+                if layer.selectedFeatures() != 0:
+                    phase_value = feat['Phase']
+                    if phase_value == NULL:
+                        if '_EMPTY VALUES' not in phase_values:
+                            phase_values.append('_EMPTY VALUES')
+                    if phase_value != NULL:
+                        if phase_value not in phase_values:
+                            phase_values.append(phase_value)    
 
 
-        phase_values_copy = phase_values.copy()
-        if '_EMPTY VALUES' in phase_values_copy:
-            phase_values_copy.remove('_EMPTY VALUES')
+            phase_values_copy = phase_values.copy()
+            if '_EMPTY VALUES' in phase_values_copy:
+                phase_values_copy.remove('_EMPTY VALUES')
 
-        if len(phase_values) > 1 and len(phase_values_copy) != 0:
-            self.dockwidget.phase_comboBox_2.setCurrentText('')
-            
-            self.dockwidget.phase_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 "background-color: #ffcccc;"
-                                                                 "}")
-            multiple_phases = ', ' .join(str(e) for e in sorted(phase_values))
-            self.dockwidget.multiphase_label.setText(multiple_phases)
-            
-             
-            
-        if len(phase_values) == 1 and '_EMPTY VALUES' not in phase_values:         
-            self.dockwidget.phase_comboBox_2.setCurrentText(phase_values[0])
-            self.dockwidget.phase_comboBox_2.setStyleSheet("QComboBox"
-                                                                 "{"
-                                                                 ""
-                                                                 "}")
-            self.dockwidget.multiphase_label.setText('')
+            if len(phase_values) > 1 and len(phase_values_copy) != 0:
+                self.dockwidget.phase_comboBox_2.setCurrentText('')
+                
+                self.dockwidget.phase_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     "background-color: #ffcccc;"
+                                                                     "}")
+                multiple_phases = ', ' .join(str(e) for e in sorted(phase_values))
+                self.dockwidget.multiphase_label.setText(multiple_phases)
+                
+                 
+                
+            if len(phase_values) == 1 and '_EMPTY VALUES' not in phase_values:         
+                self.dockwidget.phase_comboBox_2.setCurrentText(phase_values[0])
+                self.dockwidget.phase_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.multiphase_label.setText('')
             
     def clean_attributes(self):
+        
+        print('clean')
+        
         ##clean
         self.dockwidget.group_number_comboBox_2.clear()
         self.dockwidget.group_name_comboBox_2.clear()   
@@ -1247,7 +1260,6 @@ class PCAPostExcavation:
         self.dlgtool6.groups_pushButton.clicked.connect(self.apply_groups_style)
         self.dlgtool6.entities_pushButton.clicked.connect(self.apply_entity_style)
         
-         
     def apply_groups_style(self):
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
             return self.dontdonothing

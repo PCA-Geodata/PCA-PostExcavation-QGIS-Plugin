@@ -752,7 +752,7 @@
           </font>
          </property>
          <property name="editable">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="placeholderText">
           <string/>
@@ -853,7 +853,7 @@
           </font>
          </property>
          <property name="editable">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="placeholderText">
           <string/>
