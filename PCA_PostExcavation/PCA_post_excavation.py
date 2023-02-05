@@ -1925,14 +1925,36 @@ class PCAPostExcavation:
                     # {'expression': '"fid"','length': 0,'name': 'GIS_fid','precision': 0,'type': 2}
                     ]
                 
+                
+                
+                
                 if table_to_export.name() == 'DRS_Trench_sheet':
+                    
+                    ### to be fixed - doesn't work###
+                    '''
+                    Probably I must add here a method to create a new field on the DRS Trench Sheet that will be 
+                    populated with this expression and then, use this field to export on the summary field
+                    '''
+                    
+                    
+                    # archaeology_on_trench = '''
+                                            # array_to_string( 
+                                            # aggregate(
+                                            # layer:='Interventions',
+                                            # aggregate:='array_agg',
+                                            # expression:=concat("DRS_Category",' [',to_string("Context_no"),']'),
+                                            # filter:=contains(geometry(@parent), $geometry)),
+                                            # delimiter:=', ')
+                                            # '''                    
+                    ###
+                    
                     DRS_Field_scheme = [
                     {'expression': "'"+sitecode+"'",'length': 100,'name': 'Site Code','precision': 0,'type': 10},
                     {'expression': '"Trench_Number"','length': 0,'name': 'Trench Number','precision': 0,'type': 2},
                     {'expression': '"Trench1_Orientation"','length': 0,'name': 'Alignment','precision': 0,'type': 10},
                     {'expression': '"Trench_Length"','length': 0,'name': 'Length (m)','precision': 2,'type': 6},
                     {'expression': '"Trench_Width"','length': 0,'name': 'Width (m)','precision': 2,'type': 6},
-                    {'expression': '"Maximum_trench_depth_(m)"','length': 0,'name': 'Max Machine depth (m)','precision': 3,'type': 6},
+                    {'expression': '"Maximum_trench_depth"','length': 0,'name': 'Max Machine depth (m)','precision': 3,'type': 6},
                     ###add an expression to retrieve the level from levels
                     {'expression': '','length': 0,'name': 'Level of Natural (m OD)','precision': 3,'type': 6},
                     #not on original table
@@ -1941,16 +1963,17 @@ class PCAPostExcavation:
                     {'expression': '"Natural_description"','length': 0,'name': 'Natural_description','precision': 0,'type': 10},
                     #end1
                     {'expression': '"End_1_Location"','length': 0,'name': 'End 1 Location','precision': 0,'type': 10}, 
-                    {'expression': '"Topsoil_thickness_End_1_(m)"','length': 0,'name': 'Topsoil thickness End 1 (m)','precision': 0,'type': 10},#ok
-                    {'expression': '"Subsoil_Thickness_End_1_(m)"','length': 0,'name': 'Subsoil Thickness End 1 (m)','precision': 0,'type': 10},
+                    {'expression': '"Topsoil_thickness_End_1"','length': 0,'name': 'Topsoil thickness End 1 (m)','precision': 3,'type': 6},
+                    {'expression': '"Subsoil_Thickness_End_1"','length': 0,'name': 'Subsoil Thickness End 1 (m)','precision': 3,'type': 6},
                     #insert expression
                     {'expression': '','length': 0,'name': 'Natural depth End 1 (m OD)','precision': 3,'type': 6},
                     # #end2
                     {'expression': '"End_2_Location"','length': 0,'name': 'End_2_Location','precision': 0,'type': 10},
-                    {'expression': '"Topsoil_thickness_End_2_(m)"','length': 0,'name': 'Topsoil thickness End 2 (m)','precision': 0,'type': 10},
-                    {'expression': '"Subsoil_Thickness_End_2_(m)"','length': 0,'name': 'Subsoil Thickness End 2 (m)','precision': 0,'type': 10},
+                    {'expression': '"Topsoil_thickness_End_2"','length': 0,'name': 'Topsoil thickness End 2 (m)','precision': 3,'type': 6},
+                    {'expression': '"Subsoil_Thickness_End_2"','length': 0,'name': 'Subsoil Thickness End 2 (m)','precision': 3,'type': 6},
                     #insert expression
                     {'expression': '','length': 0,'name': 'Natural depth End 2 (m OD)','precision': 3,'type': 6},
+                    
                     {'expression': '"Layers"','length': 0,'name': 'Layers','precision': 0,'type': 10},
                     #archaeology
                     {'expression': '"Archaeology_Presence"','length': 0,'name': 'Archaeology Presence','precision': 0,'type': 10},
@@ -1958,17 +1981,17 @@ class PCAPostExcavation:
                     ########## to check##########
                     #Create an expression that count the features and retieve the features typology from DRS and count them 
                     #insert expression
-                    {'expression': '','length': 0,'name': 'Summary of Archaeological Features','precision': 0,'type': 10},
+                    {'expression': '','length': 100,'name': 'Summary of Archaeological Features','precision': 0,'type': 10},
                     #photos
-                    {'expression': '"DSLR_camera_set_number"','length': 0,'name': 'DSLR camera set number','precision': 0,'type': 10},
-                    {'expression': '"DSLR_photo_numbers"','length': 0,'name': 'DSLR photo numbers','precision': 0,'type': 10},
-                    #attachments
-                    {'expression': '"Trench_photo"','length': 0,'name': 'Trench photo','precision': 0,'type': 10},
-                    {'expression': '"Sketch_plan"','length': 0,'name': 'Sketch plan','precision': 0,'type': 10},
-                    #recorded
-                    {'expression': '"Recorded_by"','length': 0,'name': 'Recorded by','precision': 0,'type': 10},
-                    {'expression': '"Timestamp"','length': 0,'name': 'Timestamp','precision': 0,'type': 10},
-                    {'expression': '"fid"','length': 0,'name': 'GISfid','precision': 0,'type': 6}
+                    # {'expression': '"DSLR_camera_set_number"','length': 0,'name': 'DSLR camera set number','precision': 0,'type': 10},
+                    # {'expression': '"DSLR_photo_numbers"','length': 0,'name': 'DSLR photo numbers','precision': 0,'type': 10},
+                    # #attachments
+                    # {'expression': '"Trench_photo"','length': 0,'name': 'Trench photo','precision': 0,'type': 10},
+                    # {'expression': '"Sketch_plan"','length': 0,'name': 'Sketch plan','precision': 0,'type': 10},
+                    # #recorded
+                    # {'expression': '"Recorded_by"','length': 0,'name': 'Recorded by','precision': 0,'type': 10},
+                    # {'expression': '"Timestamp"','length': 0,'name': 'Timestamp','precision': 0,'type': 10},
+                    # {'expression': '"fid"','length': 0,'name': 'GISfid','precision': 0,'type': 6}
                     ]
 
 

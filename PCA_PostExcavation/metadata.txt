@@ -6,7 +6,7 @@
 name=PCA Post Excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=2.09
+version=2.10
 author=Valerio Pinna (Pre-Construct Archaeology)
 email=vpinna@pre-construct.com
 
@@ -24,7 +24,9 @@ repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog= 2.09
+changelog=2.10
+ - Fixed minor bugs on exporting Trench sheets spreadsheet to Access 
+ <p>2.09
  - Changed main dock panel graphic
  <p>2.08
  - Fix Custom Group Names not appearing on panel if selected
