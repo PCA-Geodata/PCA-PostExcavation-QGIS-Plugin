@@ -1787,6 +1787,9 @@ class PCAPostExcavation:
                 finds_bone_check = '''if("Finds" ilike '%Animal Bone%', 'yes','')'''
                 finds_flint_check = '''if("Finds" ilike '%flint%', 'yes','')'''
                 
+                length_check_and_fix = '''if(length(  "Length" )<> 0,  "Length" , 0)'''
+                width_check_and_fix = '''if(length(  "Width" )<> 0,  "Width" , 0)'''
+                depth_check_and_fix = '''if(length(  "Depth" )<> 0,  "Depth" , 0)'''
                 
                 interpretation_field = '''concat( "Interpretation","Formation")'''
                 
@@ -1797,12 +1800,12 @@ class PCAPostExcavation:
                     {'expression': "'"+sitecode+"'",'length': 100,'name': 'Site Code','precision': 0,'type': 10},
                     {'expression': '"Context"','length': 0,'name': 'Context No','precision': 0,'type': 2},
                     {'expression': '"Cut"','length': 0,'name': 'Cut','precision': 0,'type': 2},
-                    {'expression': '"Trench"','length': 0,'name': 'Trench','precision': 0,'type': 2},
+                    {'expression': '"Trench"','length': 0,'name': 'Trench','precision': 0,'type': 10},
                     {'expression': '"Type"','length': 0,'name': 'Type','precision': 0,'type': 10},
                     {'expression': '"Category"','length': 0,'name': 'Category','precision': 0,'type': 10},
-                    {'expression': '"Length"','length': 0,'name': 'Length (m)','precision': 3,'type': 6},
-                    {'expression': '"Width"','length': 0,'name': 'Width (m)','precision': 3,'type': 6},
-                    {'expression': '"Depth"','length': 0,'name': 'Depth (m)','precision': 3,'type': 6},
+                    {'expression': length_check_and_fix,'length': 0,'name': 'Length (m)','precision': 3,'type': 6},
+                    {'expression': width_check_and_fix,'length': 0,'name': 'Width (m)','precision': 3,'type': 6},
+                    {'expression': depth_check_and_fix,'length': 0,'name': 'Depth (m)','precision': 3,'type': 6},
                     {'expression': '"Plan"','length': 0,'name': 'Plan','precision': 0,'type': 10},
                     # {'expression': '"Section_Sheet"','length': 0,'name': 'Section Sheet','precision': 0,'type': 10},
                     {'expression': '"Section"','length': 0,'name': 'Section','precision': 0,'type': 10},
@@ -1980,7 +1983,7 @@ class PCAPostExcavation:
                     {'expression': '"Finds"','length': 0,'name': 'Finds','precision': 0,'type': 10},
                     ########## to check##########
                     #Create an expression that count the features and retieve the features typology from DRS and count them 
-                    #insert expression
+                    #insert expressionLayer
                     {'expression': '','length': 100,'name': 'Summary of Archaeological Features','precision': 0,'type': 10},
                     #photos
                     # {'expression': '"DSLR_camera_set_number"','length': 0,'name': 'DSLR camera set number','precision': 0,'type': 10},
