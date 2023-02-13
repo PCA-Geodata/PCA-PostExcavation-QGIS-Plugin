@@ -793,7 +793,14 @@ class PCAPostExcavation:
                 return self.configure_dock()
     
     def open_pdf_chronology(self):
-        webbrowser.open_new(r'file://C:\Users\vpinna\AppData\Roaming\QGIS\QGIS3\profiles\PCA_Default\python\plugins\pca_post_excavation\resources\PCA_Chronological Period Table_2022_01.pdf')
+        #webbrowser.open_new(r'file://C:\Users\vpinna\AppData\Roaming\QGIS\QGIS3\profiles\PCA_Default\python\plugins\pca_post_excavation\resources\PCA_Chronological Period Table_2022_01.pdf')
+        file = r'file://C:\Users\vpinna\AppData\Roaming\QGIS\QGIS3\profiles\PCA_Default\python\plugins\pca_post_excavation\resources\PCA_Chronological Period Table_2022_01.pdf'
+        edge_path = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe %s'
+        WB = webbrowser.get(edge_path)
+        WB.open_new(file)
+
+       
+       
        
     def configure_dock(self):
                 
