@@ -23,10 +23,12 @@
 """
 import os
 import re
+import glob
 import time
+import shutil
+import random
 import os.path
 import inspect
-import random
 import processing
 import webbrowser
 from datetime import date, datetime
@@ -804,9 +806,6 @@ class PCAPostExcavation:
         # edge_path = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe %s'
         # WB = webbrowser.get(edge_path)
         # WB.open_new(file)
-
-       
-       
        
     def configure_dock(self):
                 
@@ -820,7 +819,8 @@ class PCAPostExcavation:
         self.dockwidget.group_name_comboBox_2.currentTextChanged.connect(self.change_group_number)
         self.dockwidget.entity_name_comboBox_2.currentTextChanged.connect(self.change_entity_number)
         self.dockwidget.apply_attribute_pushButton.clicked.connect(self.apply_change_on_attributes)
-        self.dockwidget.open_pdf_pushButton.clicked.connect(self.open_pdf_chronology)      
+        self.dockwidget.open_pdf_pushButton.clicked.connect(self.open_pdf_chronology)
+        self.dockwidget.backup_pushButton.clicked.connect(self.backup_features)            
         
         
         ############
@@ -1602,7 +1602,7 @@ class PCAPostExcavation:
                     # layer:='Features_for_PostEx',\
                     # aggregate:='array_agg',\
                     # expression:='''+group_name_contract+''',\
-                    # filter:=intersects($geometry,buffer(geometry(@parent),-0.01))\
+                    # filter:=intersects($geometry,buffer(geometry(@parent),-0.1))\
                     # )))\
                     # ''' )
                     ####
@@ -2010,8 +2010,6 @@ class PCAPostExcavation:
                     # {'expression': '"fid"','length': 0,'name': 'GISfid','precision': 0,'type': 6}
                     ]
 
-
-                
                 #CSVT_list_types = '''"String","Integer","Integer","Integer","String","String""Real","Real","Real","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","String","Integer"'''
                 
                 CSVT_list_types = []
@@ -2040,15 +2038,44 @@ class PCAPostExcavation:
                 'FIELDS_MAPPING':DRS_Field_scheme,
               
                 'OUTPUT': str(path+'/'+filename+'_'+now +'.csv')})
-                
-                
            
                 os.startfile(path)
-                
+
+    def backup_features (self):     
+        ##Create backup folder if not already exists
+        # Directory
+        features_PostEx_backup_directory = "_backup"
+
+        #Project Folder
+        
+        project_dir = QgsProject.instance().homePath() + '/Shapefile/PostEx_Layer/'
+
+        path = os.path.join(project_dir,features_PostEx_backup_directory)
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+        else:
+            pass
+        
+        print (project_dir)
+        print (path)
+        
+        now = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        for file in glob.glob( project_dir + "/" + "*.*" ):
+            print (file)
+            filename = os.path.basename(file)
+            name_without_ext = os.path.splitext(filename)[0]
+            extension = os.path.splitext(filename)[1]
+            backup_file_name = name_without_ext+'_'+now+extension
+        
+            backup_path_file = path+ '/'+ backup_file_name
+            shutil.copyfile(file, backup_path_file)
+
+        QMessageBox.about(
+                        None,
+                        'PCA PostExcavation Plugin',
+                        '''The backup copy of the layer Features_for_PostEx {} has been successfully created!''') 
+
     def dontdonothing(self):
         pass
-
-
-
-
-    
