@@ -6,7 +6,7 @@
 name=PCA Post Excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=2.121
+version=2.14
 author=Valerio Pinna (Pre-Construct Archaeology)
 email=vpinna@pre-construct.com
 
@@ -24,7 +24,11 @@ repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=2.121
+changelog=2.14
+ - Change multiphase string to avoid the use of /
+ <p>2.13
+ -Added backup button to form
+ <p>2.121
  - Fix Chronological table path error (change from absolute for relative)
  <p>2.12
  - Changed appplication for open the Chronological table from Acrobat to Edge

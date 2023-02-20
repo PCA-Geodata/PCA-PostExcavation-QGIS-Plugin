@@ -1367,14 +1367,14 @@ class PCAPostExcavation:
                 else:
                     phase = e['Phase']
                 #e_string = str(per_no)+' '+str(per)+' - '+str(subper_no)+' '+str(subper)+' - '+str(phase)
-                e_string = '{} - {}'.format(per_no, per)
+                e_string = '{} {}'.format(per_no, per)
                 if subper_no != '':
-                    e_string2 = ' / {} - {}'.format(subper_no, subper)
+                    e_string2 = ' - {} {}'.format(subper_no, subper)
                     e_string = e_string + e_string2
                 if phase != '':
-                    e_string3 = ' / {}'.format(phase)
+                    e_string3 = ' - {}'.format(phase)
                     e_string = e_string + e_string3
-                if e_string != 'NULL - NULL':
+                if e_string != 'NULL NULL':
                     phasing_set.add(e_string)
                 
             for u in phasing_set:
@@ -1401,17 +1401,23 @@ class PCAPostExcavation:
             # Field name
             expression = '''
             concat(
-            "Period_no" ,' - ' ,
-            "Period" ,
+            if (Period_no is not Null,
+
+            "Period_no" || ' '||
+            "Period",'')
+            ,
             if (SubPer_no is not Null, 
-            ' / '||
-            "SubPer_no" ||' - '||
+            ' - '||
+            "SubPer_no" ||' '||
             "SubPeriod", '')
             ,
             if (Phase is not Null, 
-             ' / ' ||
-            "Phase", ''))
+             ' - ' ||
+            "Phase", '')
+            )
+
             '''
+            
             # Set the categorized renderer
             renderer = QgsCategorizedSymbolRenderer(expression, categories)
 
