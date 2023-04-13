@@ -6,7 +6,7 @@
 name=PCA Post Excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=2.14
+version=2.20
 author=Valerio Pinna (Pre-Construct Archaeology)
 email=vpinna@pre-construct.com
 
@@ -24,7 +24,19 @@ repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=2.14
+changelog=2.20
+ New major release. Several small bux fixed and a few changes
+ - Button for backup removed. It will be from now covered by the PCA Geomax processing backup tool
+ - Storage of the new layer Features_for_PostEx moved from shp format on shapefiles folder to layer in main project Geopackage
+ - Added Clean Sub Period button for remove attribute values on multiattribute option
+ - Fixed bug on Subperiods not changing when the Period changed. Now the subperiods are cleaned
+ - Added Clean Phase button for remove attribute values on multiattribute option
+ - Fixed bug on Phases not changing when the Period or the Sub Period changed. Now the phase box value is set to '' as soon the period or the subperiod change
+ - Fixed bug on selecting Modern from period list. Now this action remove previous subperiods and phases if is not starting with 8. from attribute table
+ - Fixed bug on selecting Undated from period list. Now this action remove previous periods, subperiods and phases from attribute table
+ - Changed Cronological Table PDF (v.2) Minor typo fix
+ - Fixed minor bug on Feature style
+ <p>2.14
  - Change multiphase string to avoid the use of /
  <p>2.13
  -Added backup button to form
@@ -39,8 +51,8 @@ changelog=2.14
  <p>2.09
  - Changed main dock panel graphic
  <p>2.08
- - Fix Custom Group Names not appearing on panel if selected
- - Fix Max Group Value appearing on panel after cleaning selection
+ - Fixed Custom Group Names not appearing on panel if selected
+ - Fixed Max Group Value appearing on panel after cleaning selection
  <p>2.07
  - Added Entities style 
  - Added line to turn off labels on combined phases style

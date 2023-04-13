@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>497</width>
-    <height>750</height>
+    <height>772</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,7 +22,7 @@
   <property name="minimumSize">
    <size>
     <width>497</width>
-    <height>600</height>
+    <height>718</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -48,96 +48,21 @@
     <property name="sizeConstraint">
      <enum>QLayout::SetDefaultConstraint</enum>
     </property>
-    <item row="2" column="4">
-     <widget class="QPushButton" name="open_pdf_pushButton">
-      <property name="minimumSize">
+    <item row="7" column="2">
+     <spacer name="horizontalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
        <size>
-        <width>160</width>
+        <width>40</width>
         <height>20</height>
        </size>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>100000</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="palette">
-       <palette>
-        <active>
-         <colorrole role="Button">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>217</red>
-            <green>246</green>
-            <blue>255</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </active>
-        <inactive>
-         <colorrole role="Button">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>217</red>
-            <green>246</green>
-            <blue>255</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </inactive>
-        <disabled>
-         <colorrole role="Button">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>217</red>
-            <green>246</green>
-            <blue>255</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </disabled>
-       </palette>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>6</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
-      </property>
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Open Chronological Table</string>
-      </property>
-     </widget>
+     </spacer>
     </item>
-    <item row="1" column="2">
-     <widget class="QLabel" name="label">
-      <property name="maximumSize">
-       <size>
-        <width>50</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>icons/pca_logo_icon.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0" colspan="5">
-     <widget class="QGroupBox" name="groupBox">
+    <item row="5" column="0" colspan="4">
+     <widget class="QGroupBox" name="groupBox_2">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
         <horstretch>0</horstretch>
@@ -147,42 +72,104 @@
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>120</height>
+        <height>205</height>
        </size>
       </property>
       <property name="font">
        <font>
-        <pointsize>8</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
       <property name="title">
-       <string>Entity</string>
+       <string>Period</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_7">
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="3" column="1">
+        <widget class="QLabel" name="label_24">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Sub Period number</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="entity_number_comboBox_2">
+        <widget class="QComboBox" name="period_number_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
-           <width>1241234</width>
+           <width>16777215</width>
            <height>16777215</height>
           </size>
          </property>
          <property name="font">
           <font>
-           <pointsize>8</pointsize>
            <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
-         <property name="editable">
-          <bool>true</bool>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_23">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Sub Period</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_22">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Period Number</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="subperiod_number_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
          </property>
         </widget>
        </item>
        <item row="2" column="0" colspan="2">
-        <widget class="QLabel" name="multientity_label">
+        <widget class="QLabel" name="multiperiod_label">
          <property name="font">
           <font>
            <pointsize>6</pointsize>
@@ -199,55 +186,114 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QComboBox" name="entity_name_comboBox_2">
+       <item row="10" column="0" colspan="2" alignment="Qt::AlignHCenter">
+        <widget class="QPushButton" name="clear_subperiod_pushButton">
+         <property name="minimumSize">
+          <size>
+           <width>130</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>170</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="font">
           <font>
-           <pointsize>8</pointsize>
+           <pointsize>7</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Clear Sub Periods</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QComboBox" name="period_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
            <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
          <property name="editable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="placeholderText">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_19">
+       <item row="4" column="0">
+        <widget class="QComboBox" name="sub_period_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
          <property name="font">
           <font>
-           <pointsize>8</pointsize>
            <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
-         <property name="text">
-          <string>Entity number</string>
+         <property name="editable">
+          <bool>false</bool>
+         </property>
+         <property name="placeholderText">
+          <string/>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="label_18">
+        <widget class="QLabel" name="label_21">
          <property name="font">
           <font>
-           <pointsize>8</pointsize>
            <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
          <property name="text">
-          <string>Entity name</string>
+          <string>Period</string>
          </property>
         </widget>
+       </item>
+       <item row="9" column="0" colspan="2">
+        <widget class="QLabel" name="multisubperiod_label">
+         <property name="font">
+          <font>
+           <pointsize>6</pointsize>
+           <weight>50</weight>
+           <italic>true</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout"/>
        </item>
       </layout>
      </widget>
     </item>
-    <item row="7" column="4">
+    <item row="7" column="3">
      <widget class="QPushButton" name="apply_attribute_pushButton">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -326,8 +372,27 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="0" colspan="5">
-     <widget class="QGroupBox" name="groupBox_2">
+    <item row="1" column="3" alignment="Qt::AlignRight">
+     <widget class="QLabel" name="label_2">
+      <property name="maximumSize">
+       <size>
+        <width>50</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>icons/pca_logo_icon.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0" colspan="4">
+     <widget class="QGroupBox" name="groupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
         <horstretch>0</horstretch>
@@ -337,262 +402,133 @@
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>190</height>
+        <height>120</height>
        </size>
       </property>
       <property name="font">
        <font>
+        <pointsize>8</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
       <property name="title">
-       <string>Period</string>
+       <string>Entity</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_8">
-       <item row="4" column="0">
-        <widget class="QComboBox" name="sub_period_comboBox_2">
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="1" column="1">
+        <widget class="QComboBox" name="entity_number_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QComboBox" name="period_comboBox_2">
+         <property name="maximumSize">
+          <size>
+           <width>1241234</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="font">
           <font>
+           <pointsize>8</pointsize>
            <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
          <property name="editable">
-          <bool>false</bool>
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QLabel" name="multientity_label">
+         <property name="font">
+          <font>
+           <pointsize>6</pointsize>
+           <weight>50</weight>
+           <italic>true</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QComboBox" name="entity_name_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
          </property>
          <property name="placeholderText">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="label_24">
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Sub Period number</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QComboBox" name="subperiod_number_comboBox_2">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QLabel" name="multiperiod_label">
-         <property name="font">
-          <font>
-           <pointsize>6</pointsize>
-           <weight>50</weight>
-           <italic>true</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="label_22">
+        <widget class="QLabel" name="label_19">
          <property name="font">
           <font>
+           <pointsize>8</pointsize>
            <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
          <property name="text">
-          <string>Period Number</string>
+          <string>Entity number</string>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="label_21">
+        <widget class="QLabel" name="label_18">
          <property name="font">
           <font>
+           <pointsize>8</pointsize>
            <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
          <property name="text">
-          <string>Period</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="period_number_comboBox_2">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QLabel" name="multisubperiod_label">
-         <property name="font">
-          <font>
-           <pointsize>6</pointsize>
-           <weight>50</weight>
-           <italic>true</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_23">
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Sub Period</string>
+          <string>Entity name</string>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
     </item>
-    <item row="2" column="3">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="6" column="0" colspan="5">
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>110</height>
-       </size>
-      </property>
+    <item row="1" column="2" alignment="Qt::AlignHCenter">
+     <widget class="QLabel" name="label_3">
       <property name="font">
        <font>
+        <pointsize>9</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
-      <property name="title">
-       <string>Phase</string>
+      <property name="text">
+       <string>                    PCA Post-Excavation</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QLabel" name="label_26">
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Phase number</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="phase_comboBox_2">
-         <property name="maximumSize">
-          <size>
-           <width>13224213</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="editable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="multiphase_label">
-         <property name="font">
-          <font>
-           <pointsize>6</pointsize>
-           <weight>50</weight>
-           <italic>true</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
     </item>
-    <item row="3" column="0" colspan="5">
+    <item row="3" column="0" colspan="4">
      <widget class="QGroupBox" name="Group_box_4">
       <property name="enabled">
        <bool>true</bool>
@@ -645,6 +581,12 @@
        </item>
        <item row="2" column="1">
         <widget class="QComboBox" name="group_number_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>12312312</width>
@@ -682,6 +624,12 @@
        </item>
        <item row="2" column="0">
         <widget class="QComboBox" name="group_name_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <pointsize>7</pointsize>
@@ -721,21 +669,77 @@
       </layout>
      </widget>
     </item>
-    <item row="7" column="3">
-     <spacer name="horizontalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
+    <item row="2" column="3">
+     <widget class="QPushButton" name="open_pdf_pushButton">
+      <property name="minimumSize">
        <size>
-        <width>40</width>
+        <width>160</width>
         <height>20</height>
        </size>
       </property>
-     </spacer>
+      <property name="maximumSize">
+       <size>
+        <width>100000</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="palette">
+       <palette>
+        <active>
+         <colorrole role="Button">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>217</red>
+            <green>246</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </active>
+        <inactive>
+         <colorrole role="Button">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>217</red>
+            <green>246</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </inactive>
+        <disabled>
+         <colorrole role="Button">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>217</red>
+            <green>246</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </disabled>
+       </palette>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Open Chronological Table</string>
+      </property>
+     </widget>
     </item>
-    <item row="1" column="4" alignment="Qt::AlignRight">
-     <widget class="QLabel" name="label_2">
+    <item row="1" column="1">
+     <widget class="QLabel" name="label">
       <property name="maximumSize">
        <size>
         <width>50</width>
@@ -753,41 +757,132 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="3" alignment="Qt::AlignHCenter">
-     <widget class="QLabel" name="label_3">
+    <item row="2" column="2">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="6" column="0" colspan="4">
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>136</height>
+       </size>
+      </property>
       <property name="font">
        <font>
-        <pointsize>9</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
-      <property name="text">
-       <string>                    PCA Post-Excavation</string>
+      <property name="title">
+       <string>Phase</string>
       </property>
-     </widget>
-    </item>
-    <item row="7" column="1">
-     <widget class="QPushButton" name="backup_pushButton">
-      <property name="maximumSize">
-       <size>
-        <width>45</width>
-        <height>45</height>
-       </size>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>icons/backup_icon.png</normaloff>icons/backup_icon.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>25</width>
-        <height>25</height>
-       </size>
-      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label_26">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Phase number</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="phase_comboBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>13224213</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="multiphase_label">
+         <property name="font">
+          <font>
+           <pointsize>6</pointsize>
+           <weight>50</weight>
+           <italic>true</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QPushButton" name="clear_phase_pushButton">
+         <property name="minimumSize">
+          <size>
+           <width>130</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>170</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>7</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Clear Phase</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>

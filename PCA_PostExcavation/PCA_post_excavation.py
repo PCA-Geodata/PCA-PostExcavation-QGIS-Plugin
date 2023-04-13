@@ -122,7 +122,10 @@ class PCAPostExcavation:
         self.dlgtool5 = PCA_PostExc_updateDRS_Dialog()
         self.dlgtool6 = PCA_PostExc_ChooseStyle_Dialog()
         self.dlgtool7 = PCA_PostExc_ChooseDRSUpdateStep_Dialog()
-                        
+        
+        
+        self.dockwidget.clear_subperiod_pushButton.setVisible(False) 
+        self.dockwidget.clear_phase_pushButton.setVisible(False)           
         
         
         self.toolbar = iface.mainWindow().findChild( QToolBar, u'PCA PostExcavation Toolbar' )
@@ -139,7 +142,7 @@ class PCAPostExcavation:
                                      "background-color: red;"
                                      "}")
         
-       
+        
         
 
         self.pluginIsActive = False
@@ -247,9 +250,9 @@ class PCAPostExcavation:
         self.layergeneratoricon= self.add_action( 
             icon_path = ':/plugins/pca_post_excavation/icons/PCA_postex_layer_generator_icon.png',
             text=self.tr(u'Generate the PCA post-excavation layer'),
-            callback=self.generate_postex_layer,
+            callback=self.generate_postex_layer_initial_checks,
             parent=self.iface.mainWindow())     
-        # will be set False in generate_postex_layer()
+        # will be set False in generate_postex_layer_initial_checks()
         self.first_start = True
         
         self.changeattributes= self.add_action( 
@@ -284,9 +287,6 @@ class PCAPostExcavation:
         # will be set False in change_attributes()
         self.first_start = True
         
-        # # will be set False in run()
-        # self.first_start = True
-
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
 
@@ -349,7 +349,7 @@ class PCAPostExcavation:
         global sub_saxon_list
         sub_saxon_list = ['','Early Anglo-Saxon','Middle Anglo-Saxon','Late Anglo-Saxon']
         global sub_medieval_list
-        sub_medieval_list = ['','Anglo-Norman/Early Medieval','High Medieval','Late Medieval']
+        sub_medieval_list = ['','Anglo-Norman - Early Medieval','High Medieval','Late Medieval']
         global sub_postmedieval_list
         sub_postmedieval_list = ['', 'Early Post Medieval', 'Middle Post Medieval', 'Late Post Medieval']
         global sub_modern_list
@@ -400,6 +400,7 @@ class PCAPostExcavation:
             return self.dontdonothing
         if ch_period == '':
             self.dockwidget.period_number_comboBox_2.clear()
+            self.dockwidget.phase_comboBox_2.setCurrentText('')
             return self.dontdonothing
         else:
             
@@ -413,7 +414,8 @@ class PCAPostExcavation:
             ch_period_number_list = []
             ch_period_number_list.append(ch_period_number)
             self.dockwidget.period_number_comboBox_2.clear()
-            self.dockwidget.period_number_comboBox_2.addItems(ch_period_number_list)     
+            self.dockwidget.period_number_comboBox_2.addItems(ch_period_number_list)
+            self.dockwidget.phase_comboBox_2.setCurrentText('')
             
     def change_subperiod_number(self):
         ch_period = self.dockwidget.period_comboBox_2.currentText()
@@ -431,6 +433,7 @@ class PCAPostExcavation:
             else:
                 if ch_subperiod == '':
                     self.dockwidget.subperiod_number_comboBox_2.clear()
+                    self.dockwidget.phase_comboBox_2.setCurrentText('')
                 if ch_subperiod != '':
                 
                 
@@ -442,13 +445,14 @@ class PCAPostExcavation:
                         ch_subperiod_number_list = []
                         ch_subperiod_number_list.append(ch_subperiod_number_final)
                         self.dockwidget.subperiod_number_comboBox_2.clear()
-                        self.dockwidget.subperiod_number_comboBox_2.addItems(ch_subperiod_number_list)  
+                        self.dockwidget.subperiod_number_comboBox_2.addItems(ch_subperiod_number_list)
+                        self.dockwidget.phase_comboBox_2.setCurrentText('')                       
                         
     def change_group_number(self, ch_group_name):
 
 
-        print ('chage number ch_group_name', ch_group_name)
-        print ('chage number ch_group_name', len(ch_group_name))
+        #print ('change number ch_group_name', ch_group_name)
+        #print ('change number ch_group_name', len(ch_group_name))
         vlayer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
         
         
@@ -504,7 +508,7 @@ class PCAPostExcavation:
                 # proposed_group_number_list.append(new_group_number)
 
             self.dockwidget.group_number_comboBox_2.clear()
-            print ('proposed_group_number_list', proposed_group_number_list)
+            #print ('proposed_group_number_list', proposed_group_number_list)
             self.dockwidget.group_number_comboBox_2.addItems(proposed_group_number_list)  
             
             list_of_numbers.clear()
@@ -567,12 +571,11 @@ class PCAPostExcavation:
             used_entity_list.clear()
             entity_filtered_list.clear()
             entity_current_value.clear()
-                                  
-    def generate_postex_layer(self):
+    
+    def generate_postex_layer_initial_checks(self):
         if self.first_start == True:
             self.first_start = False
             
-  
         # show the dialog
         self.dlgtool3.show()
         # Run the dialog event loop
@@ -587,164 +590,169 @@ class PCAPostExcavation:
                 None,
                 'PCA PostExcavation Plugin',
                 '''This is not a valid PCA QGIS Site Plan Project''')
-        
-                
                 return self.dontdonothing()
-                
             else:
                 pass
-        
-            
-            #create a new folder
-            # Directory
-            directory = "PostEx_Layer"
 
-            #Project Folder
-            project_dir = QgsProject.instance().homePath() + '/Shapefile/'
+            #Geopackage Project Folder
+            geopackage_project_path = QgsProject.instance().homePath() + '/Geopackages/PCA_site_plan_geodatabase.gpkg'
 
-            path = os.path.join(project_dir,directory)
-
-            if not os.path.exists(path):
-                os.makedirs(path)
-            else:
-                pass
-                
-            #create new group
-
-
-            for child in root.children():
-                sitenamegroup = (child.name())
-        
-                if child.findGroup("PostEx") is None:
-                    child.insertGroup(0, "PostEx")    
+             
 
 
             #to check if the layer already exists
-            file = path+ '/Features_for_PostEx.shp'
+            layer = QgsVectorLayer(geopackage_project_path,"test","ogr")
+            subLayers =layer.dataProvider().subLayers()
+                                                
+            layer_list_name = []
+            
+            for subLayer in subLayers:
+                layer_name = subLayer.split('!!::!!')[1]
+                layer_list_name.append(layer_name)
+            
 
-            if os.path.exists(file) == True:
+            if 'Features_for_PostEx' in layer_list_name:
+                print ('file exist')
+            
                 reply = QMessageBox.warning(None,  'PCA PostExcavation Plugin',
-                                                    '''The file 'Features_for_PostEx' already exists! \nDo you want to overwrite it? All your previous edits will be lost. \n \nTo overwrite, select YES and delete the old files from the \
-                                                    disk (the folder will be open automatically) and then, re-run the plugin.''',
+                                                    '''The layer 'Features_for_PostEx' already exists! \nDo you want to overwrite it? All your previous edits will be lost.''',
                                                     QMessageBox.Yes, QMessageBox.No)
-                if reply == QMessageBox.No: 
+                if reply == QMessageBox.No:
+                    print ('file exist but i am not touching it')
                     return self.dontdonothing()
                             
                 if reply == QMessageBox.Yes:
+                    print ('file exist and...')
                     for lyr in QgsProject.instance().mapLayers().values():
                         if lyr.name() == "Features_for_PostEx":
                             QgsProject.instance().removeMapLayers([lyr.id()])
-                    path = os.path.realpath(path)
-                    os.startfile(path)
-                    # QMessageBox.about(None,'PCA PostExcavation Plugin', 'Manually delete the older files and re-run the plugin')   
+                            print ('... i removed...')
+                            
+                            return self.generate_postex_layer_process()
+            else:
+                print ('file not exist')
+                return self.generate_postex_layer_process()
                     
-                    return self.dontdonothing()
+    def generate_postex_layer_process(self): 
+        print ('now i am in process')
+        root = QgsProject.instance().layerTreeRoot()
+        geopackage_project_path = QgsProject.instance().homePath() + '/Geopackages/PCA_site_plan_geodatabase.gpkg'
+        output_parameters = "ogr:dbname='"+geopackage_project_path+"'"
+        
+        #create new group
+        for child in root.children():
+            sitenamegroup = (child.name())
+            if child.findGroup("PostEx") is None:
+                child.insertGroup(0, "PostEx")   
+    
+        
+        #merge and generate the new layer
+                           
+        shapefile_list = []
 
-           
-            shapefile_list = []
+      
+        list_of_layers = ['Archaeological_Features', 'Burials', 'Layers', 'Masonry', 'Modern', 'Furrows_and_Ridges' ]
+        for e in list_of_layers:
+            if QgsProject.instance().mapLayersByName(e):
+                origlayer= QgsProject.instance().mapLayersByName(e)[0]
+                origlayer_path = origlayer.source()
+                shapefile_list.append(origlayer_path)
+        
+        parameters = {'LAYERS': shapefile_list, 
+                      'CRS': 'EPSG:27700', 
+                      'OUTPUT':output_parameters+' table="Features_for_PostEx" (geom)'}
+                      
+                      #'OUTPUT': str(path+'/Features_for_PostEx.shp')}                
+                      
 
+        processing.runAndLoadResults("qgis:mergevectorlayers", parameters) 
+            
+        
+        
+        thelayer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
+        myblayer = root.findLayer(thelayer.id())
+        myClone = myblayer.clone()
+        parent = myblayer.parent()
+        root.findGroup("PostEx").insertChildNode(1, myClone)
+        parent.removeChildNode(myblayer) 
+
+        #expand group
+        layeronplace = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
+        myLayerNode = root.findLayer(layeronplace.id())
+        myLayerNode.setExpanded(True)
+
+
+        #remove fields
+        final_layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
+        caps = final_layer.dataProvider().capabilities()
+        
+        id_list = []
+        fields_list = []
+        for field in final_layer.fields():
+            fields_list.append(field.name())
+        if 'layer' in fields_list:
+            fields_list.remove('layer')
+        if 'fid' in fields_list:
+            fields_list.remove('fid')
+
+
+        for e in fields_list:
+            id_list.append(final_layer.fields().indexFromName(e))
+
+
+        
+        res = final_layer.dataProvider().deleteAttributes(id_list)
+        
+        
+        #add new fields
+        
+        resadd = final_layer.dataProvider()
+        resadd.addAttributes([QgsField('Group', QVariant.String, '', 254),
+                              QgsField('Entity', QVariant.String, '', 254),
+                              QgsField('Period', QVariant.String, '', 254),
+                              QgsField('Period_no', QVariant.String, '', 254),
+                              QgsField('SubPeriod', QVariant.String, '', 254),
+                              QgsField('SubPer_no', QVariant.String, '', 254),
+                              QgsField('Phase', QVariant.String, '', 254),
+                              QgsField('Notes', QVariant.String, '', 254)])
           
-            list_of_layers = ['Archaeological_Features', 'Burials', 'Layers', 'Masonry', 'Modern', 'Furrows_and_Ridges' ]
-            for e in list_of_layers:
-                if QgsProject.instance().mapLayersByName(e):
-                    origlayer= QgsProject.instance().mapLayersByName(e)[0]
-                    origlayer_path = origlayer.source()
-                    shapefile_list.append(origlayer_path)
-            
-            parameters = {'LAYERS': shapefile_list, 
-                          'CRS': 'EPSG:27700', 
-                          'OUTPUT': str(path+'/Features_for_PostEx.shp')}
+        
+        final_layer.updateFields()  
+        
+        #add style from file
+        
+        final_layer.loadNamedStyle(os.path.join(os.path.join(cmd_folder, 'qml/PCA_PostExcavation_Features_Style.qml')))    
 
-            processing.run("qgis:mergevectorlayers", parameters) 
-                
-            new_layer = path+'/Features_for_PostEx.shp'
-            postexlayer = iface.addVectorLayer(new_layer, "Features_for_PostEx", "ogr")
-            if not postexlayer:
-                print("Layer failed to load!")
+        iface.mapCanvas().refresh()
 
-            thelayers = QgsProject.instance().mapLayersByName("Features_for_PostEx")
-            thelayer = thelayers[0]
-            myblayer = root.findLayer(thelayer.id())
-            myClone = myblayer.clone()
-            parent = myblayer.parent()
-            root.findGroup("PostEx").insertChildNode(1, myClone)
-            parent.removeChildNode(myblayer) 
+        node_group1 = root.findGroup("PostEx")
+        node_group1.setExpanded(False) # set as false to remove the false true at the creation
+        node_group1.setExpanded(True)
+        
+        myLayerNode = root.findLayer(final_layer.id())
+        myLayerNode.setExpanded(True)
 
-            #expand group
-            layeronplace = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
-            myLayerNode = root.findLayer(layeronplace.id())
-            myLayerNode.setExpanded(True)
+        for e in list_of_layers:
+            if QgsProject.instance().mapLayersByName(e):
+                origlayer= QgsProject.instance().mapLayersByName(e)[0]
+                root.findLayer(origlayer.id()).setItemVisibilityCheckedParentRecursive(False)
+        
+        
+        QgsProject.instance().layerTreeRoot().findGroup(sitenamegroup).setItemVisibilityChecked(True)
+        QgsProject.instance().layerTreeRoot().findGroup('Site Plan').setItemVisibilityChecked(True)
+        
+        
+        root.findLayer(final_layer.id()).setItemVisibilityCheckedParentRecursive(False)
+        root.findLayer(final_layer.id()).setItemVisibilityCheckedParentRecursive(True)
 
-
-            #remove fields
-            final_layer = QgsProject.instance().mapLayersByName("Features_for_PostEx")[0]
-            caps = final_layer.dataProvider().capabilities()
-            
-            id_list = []
-            fields_list = []
-            for field in final_layer.fields():
-                fields_list.append(field.name())
-            if 'layer' in fields_list:
-                fields_list.remove('layer')
-  
-
-            for e in fields_list:
-                id_list.append(final_layer.fields().indexFromName(e))
-
-
-            
-            res = final_layer.dataProvider().deleteAttributes(id_list)
-            
-            
-            #add new fields
-            
-            resadd = final_layer.dataProvider()
-            resadd.addAttributes([QgsField('Group', QVariant.String, '', 254),
-                                  QgsField('Entity', QVariant.String, '', 254),
-                                  QgsField('Period', QVariant.String, '', 254),
-                                  QgsField('Period_no', QVariant.String, '', 254),
-                                  QgsField('SubPeriod', QVariant.String, '', 254),
-                                  QgsField('SubPer_no', QVariant.String, '', 254),
-                                  QgsField('Phase', QVariant.String, '', 254),
-                                  QgsField('Notes', QVariant.String, '', 254)])
-              
-            
-            final_layer.updateFields()  
-            
-            #add style from file
-            
-            final_layer.loadNamedStyle(os.path.join(os.path.join(cmd_folder, 'qml/PCA_PostExcavation_Features_Style.qml')))    
-
-            iface.mapCanvas().refresh()
-
-            node_group1 = root.findGroup("PostEx")
-            node_group1.setExpanded(False) # set as false to remove the false true at the creation
-            node_group1.setExpanded(True)
-            
-            myLayerNode = root.findLayer(final_layer.id())
-            myLayerNode.setExpanded(True)
-
-            for e in list_of_layers:
-                if QgsProject.instance().mapLayersByName(e):
-                    origlayer= QgsProject.instance().mapLayersByName(e)[0]
-                    root.findLayer(origlayer.id()).setItemVisibilityCheckedParentRecursive(False)
-            
-            
-            QgsProject.instance().layerTreeRoot().findGroup(sitenamegroup).setItemVisibilityChecked(True)
-            QgsProject.instance().layerTreeRoot().findGroup('Site Plan').setItemVisibilityChecked(True)
-            
-            
-            root.findLayer(final_layer.id()).setItemVisibilityCheckedParentRecursive(False)
-            root.findLayer(final_layer.id()).setItemVisibilityCheckedParentRecursive(True)
-
-            
-            iface.setActiveLayer(final_layer)
-            
-            QMessageBox.about(
-            None,
-            'PCA PostExcavation Plugin',
-            '''New Post-Excavation layer successfully generated and ready for use''')
-
+        
+        iface.setActiveLayer(final_layer)
+        
+        QMessageBox.about(
+        None,
+        'PCA PostExcavation Plugin',
+        '''New Post-Excavation layer successfully generated and ready for use''')        
+    
     def open_dock_change_attributes(self):
         """Run method that loads and starts the plugin"""
         
@@ -782,6 +790,7 @@ class PCAPostExcavation:
                 layer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0] 
                 layer.selectionChanged.connect(self.activate_apply_button)
                 
+                
                 #self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
                 self.iface.addTabifiedDockWidget(Qt.RightDockWidgetArea, self.dockwidget, raiseTab=True)
                 
@@ -798,7 +807,7 @@ class PCAPostExcavation:
         pdf_path = os.path.join(
             self.plugin_dir,
             'resources',
-            'PCA_Chronological Period Table_2022_01.pdf')
+            'PCA_Chronological Period Table_2022_02.pdf')
         
         
         webbrowser.open_new(pdf_path)
@@ -807,8 +816,7 @@ class PCAPostExcavation:
         # WB = webbrowser.get(edge_path)
         # WB.open_new(file)
        
-    def configure_dock(self):
-                
+    def configure_dock(self):   
         self.period_list()
         self.group_names_list()
         self.entity_names_list()
@@ -820,7 +828,11 @@ class PCAPostExcavation:
         self.dockwidget.entity_name_comboBox_2.currentTextChanged.connect(self.change_entity_number)
         self.dockwidget.apply_attribute_pushButton.clicked.connect(self.apply_change_on_attributes)
         self.dockwidget.open_pdf_pushButton.clicked.connect(self.open_pdf_chronology)
-        self.dockwidget.backup_pushButton.clicked.connect(self.backup_features)            
+        
+
+        self.dockwidget.clear_subperiod_pushButton.clicked.connect(self.clear_selected_subperiods)
+        self.dockwidget.clear_phase_pushButton.clicked.connect(self.clear_selected_phases) 
+               
         
         
         ############
@@ -882,7 +894,7 @@ class PCAPostExcavation:
                             return self.retrievevalues()
                         if layer.selectedFeatureCount() == 0:
                             self.dockwidget.apply_attribute_pushButton.setEnabled(False)
-                            print ('zero selection')
+                            #print ('zero selection')
                             return self.clean_attributes()
                    
     def cleancomboBoxColour(self):
@@ -927,6 +939,8 @@ class PCAPostExcavation:
         self.dockwidget.multiperiod_label.setText('')
         self.dockwidget.multisubperiod_label.setText('')
         self.dockwidget.multiphase_label.setText('')
+        self.dockwidget.clear_subperiod_pushButton.setVisible(False)
+        self.dockwidget.clear_phase_pushButton.setVisible(False) 
 
     def apply_change_on_attributes(self):
 
@@ -969,42 +983,138 @@ class PCAPostExcavation:
         
         phase_field_idx = layer.fields().indexOf('Phase')
 
-        
         layer.startEditing()
-        for feat_id in layer.selectedFeatureIds():
-                      
-            if len(period_new_value) != 0:
-                layer.changeAttributeValue(feat_id, period_field_idx, period_new_value)
-            
-            if len(sub_period_new_value) != 0:
-                layer.changeAttributeValue(feat_id, sub_period_field_idx, sub_period_new_value)
-           
-            if len(period_number_new_value) != 0:
-                layer.changeAttributeValue(feat_id, period_number_field_idx, period_number_new_value)
-            
-            if len(sub_period_number_new_value) != 0:
-                layer.changeAttributeValue(feat_id, sub_period_number_field_idx, sub_period_number_new_value)
-           
-            # if len(group_value) < 2:
-                # return self.dontdonothing()
+        for feat in layer.selectedFeatures():
+            feat_id = feat.id()
+  
             if len(group_value) > 3:
                 #for feat_id in layer.selectedFeatureIds():
                 layer.changeAttributeValue(feat_id, group_field_idx, group_new_value)
 
-            # if len(entity_value) < 2:
-                # return self.dontdonothing()
             if len(entity_value) > 3:
                 #for feat_id in layer.selectedFeatureIds():
-                layer.changeAttributeValue(feat_id, entity_field_idx, entity_value)
+                layer.changeAttributeValue(feat_id, entity_field_idx, entity_value) 
             
-            # if len(phase) == 0:
-                # return self.dontdonothing()
-            if len(phase) != 0:
-                #for feat_id in layer.selectedFeatureIds():
-                layer.changeAttributeValue(feat_id, phase_field_idx, phase)
+            #period don't change
+            if len(period_new_value)!= 0 and feat['Period'] == period_new_value:
+                # no period value because being the same means that it didn't change
+                
+                if len(period_number_new_value) != 0:
+                    layer.changeAttributeValue(feat_id, period_number_field_idx, period_number_new_value)
 
+                # options for when the period is the same and change only the subperiod to zero value
+                # value present - or because is the only value or because has been added manually
+                if len(sub_period_new_value) != 0: 
+                    layer.changeAttributeValue(feat_id, sub_period_field_idx, sub_period_new_value)
+                    layer.changeAttributeValue(feat_id, sub_period_number_field_idx, sub_period_number_new_value)
+                    
+                  
+                
+                #value empty + different from current attribute value + value is empty not because of the multiple value selection
+                if len(sub_period_new_value) == 0 and feat['SubPeriod'] != sub_period_new_value and len(self.dockwidget.multisubperiod_label.text()) < 1: 
+                    layer.changeAttributeValue(feat_id, sub_period_field_idx, sub_period_new_value)#it should be empty and same as ''
+                    layer.changeAttributeValue(feat_id, sub_period_number_field_idx, sub_period_number_new_value)
+                
+                layer.changeAttributeValue(feat_id, phase_field_idx, phase)
+                print ('phase option 2')                
+
+                ## button Clean Sub Periods for option when two or more features with different values are selected and the user wants to remove all the subperiod from the attribute table
+            
+            
+            
+            
+            #period change
+            if len(period_new_value)!= 0 and feat['Period'] != period_new_value:
+                
+                # phase option 1 - period change so phase is removed
+                layer.changeAttributeValue(feat_id, phase_field_idx, phase)
+                print ('phase option 1')
+                    
+                
+          
+                if len(sub_period_new_value) == 0: 
+                    layer.changeAttributeValue(feat_id, sub_period_field_idx, '')
+                if len(sub_period_new_value) != 0: 
+                    layer.changeAttributeValue(feat_id, sub_period_field_idx, sub_period_new_value)
+                    
+                if len(sub_period_number_new_value) == 0: 
+                    layer.changeAttributeValue(feat_id, sub_period_number_field_idx, '')
+                if len(sub_period_number_new_value) != 0: 
+                    layer.changeAttributeValue(feat_id, sub_period_number_field_idx, sub_period_number_new_value)
+                
+                
+                
+                
+                
+                #period for last to avoid interference with the others
+                if len(period_new_value) != 0: 
+                    layer.changeAttributeValue(feat_id, period_field_idx, period_new_value)
+                if len(period_number_new_value) != 0:
+                    layer.changeAttributeValue(feat_id, period_number_field_idx, period_number_new_value)    
+                    
+                    
+                    
+            
+
+
+            
+                
+            # if period AND subperiod are both compilated then...
+            if feat['Period'] != '' and feat['Period'] != NULL and feat['SubPeriod'] != '' and feat['SubPeriod'] != NULL:
+               
+                #only one feature selected or many with same value (so label <1 )
+                if len(self.dockwidget.multiphase_label.text())< 1:
+                    #if phase value is not empty 
+                    if len(phase) != 0:
+                        layer.changeAttributeValue(feat_id, phase_field_idx, phase)
+                        
+                    #if phase value is empty (never compiled or manually deleted)
+                    if len(phase) == 0:
+                        layer.changeAttributeValue(feat_id, phase_field_idx, '')
+                
+                #many feature selected with many values (so label >1 )
+                if len(self.dockwidget.multiphase_label.text())>1:
+                    #if phase value is not empty, so added manually
+                    if len(phase) != 0:
+                        layer.changeAttributeValue(feat_id, phase_field_idx, phase)
+                    
+                   #if phase value is empty, so multivalues are present
+                    ##add Clear phase button
+            
+            
+            #final check on attribute table        
+            # if period OR subperiods are empty phase must be empty
+            
+                
+            if period_new_value == 'Undated':
+                layer.changeAttributeValue(feat_id, sub_period_field_idx, '')
+                layer.changeAttributeValue(feat_id, period_number_field_idx, '')
+                layer.changeAttributeValue(feat_id, sub_period_number_field_idx, '')
+                layer.changeAttributeValue(feat_id, phase_field_idx, '')   
+
+            # if period_new_value == 'Modern':
+                # layer.changeAttributeValue(feat_id, sub_period_field_idx, '')
+                # layer.changeAttributeValue(feat_id, sub_period_number_field_idx, '')
+                # if feat['Phase'] != NULL:
+                    # if len(feat['Phase']) != 0:
+                        # if feat['Phase'][0] != '8':
+                            # print (feat['Phase'])
+                            # layer.changeAttributeValue(feat_id, phase_field_idx, '')   
+                
         layer.commitChanges()
+        # layer.startEditing()
+        # if feat['Period'] == '' or feat['Period'] == NULL or feat['SubPeriod'] == '' or feat['SubPeriod'] == NULL:
+                
+                # print (feat['Period'])
+                # print (feat['SubPeriod'])
+                # #layer.changeAttributeValue(feat_id, phase_field_idx, '')
+                
+                # print ('final clean applied')
+        
+        # layer.commitChanges()
+        
         layer.removeSelection()
+        
         
         first_use.append('Used')
         return self.clean_attributes()
@@ -1115,10 +1225,10 @@ class PCAPostExcavation:
             for feat in layer.selectedFeatures():
                 if layer.selectedFeatures() != 0:
                     period_value = feat['Period']
-                    if period_value == NULL:
+                    if period_value == NULL or period_value == '':
                         if '_EMPTY VALUES' not in period_values:
                             period_values.append('_EMPTY VALUES')
-                    if period_value != NULL:
+                    if period_value != NULL and period_value != '':
                         if period_value not in period_values:
                             period_values.append(period_value)    
 
@@ -1135,6 +1245,7 @@ class PCAPostExcavation:
                                                                      "}")
                 multiple_periods = ', ' .join(str(e) for e in sorted(period_values))
                 self.dockwidget.multiperiod_label.setText(multiple_periods)
+                
 
             
             if len(period_values) == 1:
@@ -1154,16 +1265,17 @@ class PCAPostExcavation:
                                                                      ""
                                                                      "}")
                 self.dockwidget.multiperiod_label.setText('')
+                
 
             #subperiod
             subperiod_values = []
             for feat in layer.selectedFeatures():
                 if layer.selectedFeatures() != 0:
                     subperiod_value = feat['SubPeriod']
-                    if subperiod_value == NULL:
+                    if subperiod_value == NULL or subperiod_value == '':
                         if '_EMPTY VALUES' not in subperiod_values:
                             subperiod_values.append('_EMPTY VALUES')
-                    if subperiod_value != NULL:
+                    if subperiod_value != NULL and subperiod_value != '':
                         if subperiod_value not in subperiod_values:
                             subperiod_values.append(subperiod_value)    
 
@@ -1180,6 +1292,7 @@ class PCAPostExcavation:
                                                                      "}")
                 multiple_subperiods = ', ' .join(str(e) for e in sorted(subperiod_values))
                 self.dockwidget.multisubperiod_label.setText(multiple_subperiods)
+                self.dockwidget.clear_subperiod_pushButton.setVisible(True) 
                 
             if len(subperiod_values) == 1:
 
@@ -1198,20 +1311,21 @@ class PCAPostExcavation:
                                                                      ""
                                                                      "}")
                 self.dockwidget.multisubperiod_label.setText('')
+                self.dockwidget.clear_subperiod_pushButton.setVisible(False)
+                
             
             #phase
             phase_values = []
             for feat in layer.selectedFeatures():
                 if layer.selectedFeatures() != 0:
                     phase_value = feat['Phase']
-                    if phase_value == NULL:
+                    if phase_value == NULL or phase_value == '':
                         if '_EMPTY VALUES' not in phase_values:
                             phase_values.append('_EMPTY VALUES')
-                    if phase_value != NULL:
+                    if phase_value != NULL and phase_value != '':
                         if phase_value not in phase_values:
-                            phase_values.append(phase_value)    
-
-
+                            phase_values.append(phase_value)
+                    
             phase_values_copy = phase_values.copy()
             if '_EMPTY VALUES' in phase_values_copy:
                 phase_values_copy.remove('_EMPTY VALUES')
@@ -1225,6 +1339,8 @@ class PCAPostExcavation:
                                                                      "}")
                 multiple_phases = ', ' .join(str(e) for e in sorted(phase_values))
                 self.dockwidget.multiphase_label.setText(multiple_phases)
+                self.dockwidget.clear_phase_pushButton.setVisible(True)
+                
                 
                  
                 
@@ -1235,10 +1351,20 @@ class PCAPostExcavation:
                                                                      ""
                                                                      "}")
                 self.dockwidget.multiphase_label.setText('')
+                self.dockwidget.clear_phase_pushButton.setVisible(False)
+                
+                
+            if len(phase_values) == 1 and '_EMPTY VALUES' in phase_values:
+                self.dockwidget.phase_comboBox_2.setStyleSheet("QComboBox"
+                                                                     "{"
+                                                                     ""
+                                                                     "}")
+                self.dockwidget.multiphase_label.setText('')
+                self.dockwidget.clear_phase_pushButton.setVisible(False)
             
     def clean_attributes(self):
         
-        print('clean')
+        #print('clean')
         
         ##clean
         self.dockwidget.group_number_comboBox_2.clear()
@@ -1259,6 +1385,56 @@ class PCAPostExcavation:
 
         return self.cleancomboBoxColour()
     
+    def clear_selected_phases(self):
+       
+        layer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
+        
+        phase_field_idx = layer.fields().indexOf('Phase')
+        
+        reply = QMessageBox.warning(None,  'PCA PostExcavation Plugin',
+                                            '''Do you really want to clean all the phases for the selected features?''',
+                                            QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.No: 
+            return self.dontdonothing()
+                    
+        if reply == QMessageBox.Yes:
+            layer.startEditing()
+            for feat in layer.selectedFeatures():
+            
+                feat_id = feat.id()
+     
+                layer.changeAttributeValue(feat_id, phase_field_idx, '')
+
+            layer.commitChanges()     
+            return self.retrievevalues()
+            
+    def clear_selected_subperiods(self):
+       
+        layer = QgsProject.instance().mapLayersByName('Features_for_PostEx')[0]
+        
+        sub_period_field_idx = layer.fields().indexOf('SubPeriod')
+        sub_period_number_field_idx = layer.fields().indexOf('SubPer_no')
+        phase_field_idx = layer.fields().indexOf('Phase')
+        
+        reply = QMessageBox.warning(None,  'PCA PostExcavation Plugin',
+                                            '''Do you really want to clean all the subperiods for the selected features?''',
+                                            QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.No: 
+            return self.dontdonothing()
+                    
+        if reply == QMessageBox.Yes:
+            layer.startEditing()
+            for feat in layer.selectedFeatures():
+            
+                feat_id = feat.id()
+     
+                layer.changeAttributeValue(feat_id, sub_period_field_idx, '')
+                layer.changeAttributeValue(feat_id, sub_period_number_field_idx, '')
+                layer.changeAttributeValue(feat_id, phase_field_idx, '')
+
+            layer.commitChanges()     
+            return self.retrievevalues()     
+   
     def choose_style(self):
         self.dlgtool6.raise_()
 
@@ -1534,7 +1710,6 @@ class PCAPostExcavation:
            # self.first_start = False
         self.dlgtool7.update_intervention_pushButton.clicked.connect(self.update_intervention_from_features)
         self.dlgtool7.update_DRS_pushButton.clicked.connect(self.from_intervention_to_DRS)
-            # show the dialog
         
     def update_intervention_from_features(self):
         # if self.first_start == True:
@@ -2046,42 +2221,6 @@ class PCAPostExcavation:
                 'OUTPUT': str(path+'/'+filename+'_'+now +'.csv')})
            
                 os.startfile(path)
-
-    def backup_features (self):     
-        ##Create backup folder if not already exists
-        # Directory
-        features_PostEx_backup_directory = "_backup"
-
-        #Project Folder
-        
-        project_dir = QgsProject.instance().homePath() + '/Shapefile/PostEx_Layer/'
-
-        path = os.path.join(project_dir,features_PostEx_backup_directory)
-
-        if not os.path.exists(path):
-            os.makedirs(path)
-        else:
-            pass
-        
-        print (project_dir)
-        print (path)
-        
-        now = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-        for file in glob.glob( project_dir + "/" + "*.*" ):
-            print (file)
-            filename = os.path.basename(file)
-            name_without_ext = os.path.splitext(filename)[0]
-            extension = os.path.splitext(filename)[1]
-            backup_file_name = name_without_ext+'_'+now+extension
-        
-            backup_path_file = path+ '/'+ backup_file_name
-            shutil.copyfile(file, backup_path_file)
-
-        QMessageBox.about(
-                        None,
-                        'PCA PostExcavation Plugin',
-                        '''The backup copy of the layer Features_for_PostEx {} has been successfully created!''') 
 
     def dontdonothing(self):
         pass
