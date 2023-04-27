@@ -1488,7 +1488,6 @@ class PCAPostExcavation:
             iface.mapCanvas().refresh()
             
     def clean_empty_rules(self):
-    
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
             return self.dontdonothing
         else:
@@ -1517,6 +1516,7 @@ class PCAPostExcavation:
             iface.mapCanvas().refresh()
 
     def combined_periods_phases_style(self):
+        
         if len(QgsProject.instance().mapLayersByName('Features_for_PostEx')) == 0:
             return self.dontdonothing
         else: 
@@ -1528,9 +1528,15 @@ class PCAPostExcavation:
             phasing_classes = {}
 
             for e in layer.getFeatures():
-                per_no = e['Period_no']
-                per = e['Period']
-                if e['SubPer_no'] == NULL:
+                if e['Period'] == NULL or e['Period'] == '' :
+                    per = ''
+                else:
+                    per = e['Period']
+                if e['Period_no'] == NULL or e['Period_no'] == '' :
+                    per_no = ''
+                else:
+                    per_no = e['Period_no']
+                if e['SubPer_no'] == NULL or e['SubPer_no'] == '' :
                     subper_no = ''
                 else:
                     subper_no = e['SubPer_no']
@@ -1542,8 +1548,12 @@ class PCAPostExcavation:
                     phase = ''
                 else:
                     phase = e['Phase']
-                #e_string = str(per_no)+' '+str(per)+' - '+str(subper_no)+' '+str(subper)+' - '+str(phase)
-                e_string = '{} {}'.format(per_no, per)
+
+                e_string = ''
+                if per_no != '':
+                    e_string1 = '{} {}'.format(per_no, per)
+                    e_string = e_string + e_string1
+                
                 if subper_no != '':
                     e_string2 = ' - {} {}'.format(subper_no, subper)
                     e_string = e_string + e_string2
@@ -1555,7 +1565,7 @@ class PCAPostExcavation:
                 
             for u in phasing_set:
                 phasing_list.append(u)
-            
+
             for c in sorted(phasing_list):
                 phasing_classes[c]= ("#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]), c)
                 
@@ -1577,21 +1587,23 @@ class PCAPostExcavation:
             # Field name
             expression = '''
             concat(
-            if (Period_no is not Null,
+                if (Period_no is not Null,
+                if (Period_no is not '',
 
-            "Period_no" || ' '||
-            "Period",'')
-            ,
-            if (SubPer_no is not Null, 
-            ' - '||
-            "SubPer_no" ||' '||
-            "SubPeriod", '')
-            ,
-            if (Phase is not Null, 
-             ' - ' ||
-            "Phase", '')
-            )
-
+                "Period_no" || ' '||
+                "Period",''),'')
+                ,
+                if (SubPer_no is not Null, 
+                if (SubPer_no is not '', 
+                ' - '||
+                "SubPer_no" ||' '||
+                "SubPeriod", ''),'')
+                ,
+                if (Phase is not Null, 
+                if (Phase is not '', 
+                 ' - ' ||
+                "Phase", ''),'')
+                )
             '''
             
             # Set the categorized renderer
