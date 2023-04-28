@@ -6,7 +6,7 @@
 name=PCA Post Excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=3.01
+version=3.02
 author=Valerio Pinna (Pre-Construct Archaeology)
 email=vpinna@pre-construct.com
 
@@ -24,7 +24,9 @@ repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=3.01
+changelog=3.02
+ - Fixing wrong metadata in 3.01
+ <p>3.01
  - Fixed bug on feature style. QML file changed 
  <p>3.0
  - Version number moved to 3.0 to avoid issues with previous wrong version number 2.121
