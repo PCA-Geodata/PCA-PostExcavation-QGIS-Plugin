@@ -6,7 +6,7 @@
 name=PCA Post Excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=3.02
+version=3.03
 author=Valerio Pinna (Pre-Construct Archaeology)
 email=vpinna@pre-construct.com
 
@@ -24,7 +24,11 @@ repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=3.02
+changelog=3.03
+ - Renewed dialogues style.
+ - Added exception for new DRS_Context_Database name which replaces the previous DRS_Table
+ - Added exception for new DRS_Trench_Database name which replaces the previous DRS_Trench_Sheet
+ <p>p3.02
  - Fixing wrong metadata in 3.01
  <p>3.01
  - Fixed bug on feature style. QML file changed 
