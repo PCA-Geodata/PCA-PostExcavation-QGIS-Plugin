@@ -2002,7 +2002,7 @@ class PCAPostExcavation:
         # See if OK was pressed
         if result:
             table_to_export = self.dlgtool4.Tables_on_GIS_comboBox.currentLayer()
-            AccessDB_to_update = self.dlgtool4.Access_database_mQgsFileWidget.filePath()
+            #AccessDB_to_update = self.dlgtool4.Access_database_mQgsFileWidget.filePath()
             
             if table_to_export is None:
                 QMessageBox.about(None,'PCA PostExcavation Plugin', 'No valid DRS Context Database was selected. Please select a layer.')
@@ -2014,7 +2014,7 @@ class PCAPostExcavation:
                 now = datetime.now().strftime("%Y%m%d_%H%M%S")
                     
                 # Directory
-                CSV_export_directory = "Exported_CSV"
+                CSV_export_directory = "Exported_DRS_to_CSV"
 
                 #Project Folder
                 project_dir = QgsProject.instance().homePath() + '/Databases/'
