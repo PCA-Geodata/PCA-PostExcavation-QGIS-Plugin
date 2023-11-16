@@ -6,7 +6,7 @@
 name=PCA Post Excavation
 qgisMinimumVersion=3.0
 description=PCA Post-excavation is an internal QGIS Plugin specifically built for the PCA post-excavation phase
-version=3.04
+version=3.11
 author=Valerio Pinna (Pre-Construct Archaeology)
 email=vpinna@pre-construct.com
 
@@ -24,20 +24,29 @@ repository=https://github.com/PCA-Geodata/PCA-PostExcavation-QGIS-Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=3.04
+changelog=<strong>3.12</strong>
+ - Fixed minor bug on qml styles
+ <p><strong>3.11</strong>
+ - Bug fixed. Removed old reference to missing method CloseBothDialogues
+ <p><strong>3.10</strong>
+ - Added new 'to_check' field to interventions that store a feedback from Features to Interventions data passage.
+ - New faster method for updating Interventions from Features for PostExcavation
+ - New faster method for updating DRS from Interventions
+ - Changed random color method for combined periods phases style 
+ <p><strong>3.04</strong>
  - Fixed minor bug on Access export tool
- <p>3.03
+ <p><strong>3.03</strong>
  - Renewed dialogues style.
  - Added exception for new DRS_Context_Database name which replaces the previous DRS_Table
  - Added exception for new DRS_Trench_Database name which replaces the previous DRS_Trench_Sheet
- <p>p3.02
+ <p><strong>3.02</strong>
  - Fixing wrong metadata in 3.01
- <p>3.01
+ <p><strong>3.01</strong>
  - Fixed bug on feature style. QML file changed 
- <p>3.0
+ <p><strong>3.0</strong>
  - Version number moved to 3.0 to avoid issues with previous wrong version number 2.121
  - Minor correction on multiphase style expression
- <p>2.50
+ <p><strong>2.50</strong>
  New major release. Several small bux fixed and a few changes
  - Button for backup removed. It will be from now covered by the PCA Geomax processing backup tool
  - Storage of the new layer Features_for_PostEx moved from shp format on shapefiles folder to layer in main project Geopackage
@@ -50,29 +59,29 @@ changelog=3.04
  - Changed Cronological Table PDF (v.2) Minor typo fix
  - Fixed minor bug on Feature style
  - Changed Anglo-Norman/Early Medieval to Anglo-Norman - Early Medieval to avoid the use of /
- <p>2.14
+ <p><strong>2.14</strong>
  - Change multiphase string to avoid the use of /
- <p>2.13
+ <p><strong>2.13</strong>
  -Added backup button to form
- <p>2.121
+ <p><strong>2.121</strong>
  - Fix Chronological table path error (change from absolute for relative)
- <p>2.12
+ <p><strong>2.12</strong>
  - Changed appplication for open the Chronological table from Acrobat to Edge
- <p>2.11
+ <p><strong>2.11</strong>
  - Fixed bug in export DRS table to Access when a real value is just a empty value (not value and not NULL)
- <p>2.10
+ <p><strong>2.10</strong>
  - Fixed minor bugs on exporting Trench sheets spreadsheet to Access 
- <p>2.09
+ <p><strong>2.09</strong>
  - Changed main dock panel graphic
- <p>2.08
+ <p><strong>2.08</strong>
  - Fix Custom Group Names not appearing on panel if selected
  - Fix Max Group Value appearing on panel after cleaning selection
- <p>2.07
+ <p><strong>2.07</strong>
  - Added Entities style 
  - Added line to turn off labels on combined phases style
- <p>2.06
+ <p><strong>2.06</strong>
  - Updating DRS through dictionary to speed up the process
- <p>2.05
+ <p><strong>2.05</strong>
  - Added 'Ungrouped' to group list
  - Changed Groups style (new .qml)
  - Added 'Undated' to periods

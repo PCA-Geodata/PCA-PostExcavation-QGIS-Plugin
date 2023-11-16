@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>433</width>
-    <height>386</height>
+    <width>946</width>
+    <height>376</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -89,11 +89,72 @@
   <property name="windowTitle">
    <string>PCA PostExcavation Plugin</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <property name="sizeConstraint">
-    <enum>QLayout::SetFixedSize</enum>
-   </property>
-   <item row="1" column="2">
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="6" column="0" colspan="4">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="layers_checkBox">
+       <property name="text">
+        <string>Layers</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="arch_feature_checkBox">
+       <property name="text">
+        <string>Archaeological Features</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="masonry_checkBox">
+       <property name="text">
+        <string>Masonry</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QCheckBox" name="modern_checkBox">
+       <property name="text">
+        <string>Modern</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QCheckBox" name="burials_checkBox">
+       <property name="text">
+        <string>Burials</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="furrow_checkBox">
+       <property name="text">
+        <string>Furrows and Ridges</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="3" alignment="Qt::AlignRight">
     <widget class="QLabel" name="label_3">
      <property name="maximumSize">
       <size>
@@ -112,70 +173,53 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QLabel" name="label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="3" column="0">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>15</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="8" column="0" colspan="4" alignment="Qt::AlignHCenter">
+    <widget class="QLabel" name="label_5">
      <property name="font">
       <font>
-       <pointsize>8</pointsize>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;
-&lt;head/&gt;
-&lt;style&gt;
-.emphasized { font-style: italic; }
-&lt;/style&gt;
-
-&lt;body&gt;
-
-&lt;span&gt;
-&lt;p&gt;
-&lt;p&gt;This action generates a new layer, called &lt;span class=&quot;emphasized&quot;&gt;'Features for PostEx'&lt;/span&gt; that is &lt;br/&gt; the result of merging all the layers that need group, entity, period and &lt;br/&gt; phase information.&lt;/p&gt;
-&lt;br/&gt;
-The new layer is already preformatted to be used with the plugin tools.
-
-&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
-
-&lt;p&gt;	Do you want to continue? &lt;/p&gt;
-&lt;/p&gt;
-&lt;/span&gt;
-
-
-&lt;/body&gt;
-&lt;/html&gt;
-
-
-
-</string>
+      <string>Do you want to continue? </string>
      </property>
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="maximumSize">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>65</width>
-       <height>65</height>
+       <width>20</width>
+       <height>15</height>
       </size>
      </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap>icons/pca_logo_icon.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
+    </spacer>
    </item>
-   <item row="3" column="1">
+   <item row="10" column="3">
     <widget class="QDialogButtonBox" name="button_box">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -194,7 +238,60 @@ The new layer is already preformatted to be used with the plugin tools.
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="7" column="0">
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>15</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="maximumSize">
+      <size>
+       <width>65</width>
+       <height>65</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap>icons/pca_logo_icon.png</pixmap>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="4">
+    <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This action generates a new layer, called &lt;span style=&quot; font-weight:600;&quot;&gt;'&lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Features for PostEx'&lt;/span&gt; that is the result of merging all the layers that need group, entity, period and phase information.&lt;/p&gt;&lt;p&gt;The new layer is already preformatted to be used with the plugin tools. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="2" alignment="Qt::AlignHCenter">
     <widget class="QLabel" name="label_4">
      <property name="font">
       <font>
@@ -205,6 +302,52 @@ The new layer is already preformatted to be used with the plugin tools.
      </property>
      <property name="text">
       <string>Generate Post-excavation layer</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>15</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="9" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>15</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="0" colspan="4" alignment="Qt::AlignHCenter">
+    <widget class="QLabel" name="label_6">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>If you want to exclude any of the following layers from the final Feature for PostEx, uncheck the corresponding box.</string>
      </property>
     </widget>
    </item>
